@@ -16,6 +16,7 @@ that we dont get multiple Actions that compound on each other.
 public class MacroExecutor {
     private ExecutorService exec_;
     private HashMap<String, Future<?>> stack_ = new HashMap<>();
+    private boolean terminate_ = false;
 
     public MacroExecutor(int num){
         exec_ = Executors.newFixedThreadPool(num);
@@ -31,7 +32,7 @@ public class MacroExecutor {
         Future<?> f = exec_.submit(() -> {
                 if(a != null){ 
                     a.start(); // Starts Action
-                    while(!a.isFinished()){
+                    while(!a.isFinished() && !terminate_){
                         a.start(); // Iterates until done
                     }
                     a.done(); // Ends it
@@ -58,7 +59,9 @@ public class MacroExecutor {
 
     // kills the threadpool
     public void end(){
-        exec_.shutdownNow();
+        terminate_ = true; // stops Action from updating infinitely
+        stack_.forEach((s, f) -> f.cancel(true)); // kills each future 
+        exec_.shutdownNow(); // kills threads
         System.out.println("KILL ALL CURRENT MACROS");
     }
 }
