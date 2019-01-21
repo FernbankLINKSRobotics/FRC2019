@@ -1,6 +1,9 @@
 package frc.team4468.robot;
 
 import edu.wpi.first.wpilibj.TimedRobot;
+import frc.team4468.robot.Lib.SubsystemManager;
+import frc.team4468.robot.Lib.Actions.MacroExecutor;
+import frc.team4468.robot.Subs.Drive;
 
 
 /**
@@ -11,12 +14,26 @@ import edu.wpi.first.wpilibj.TimedRobot;
  * project.
  */
 public class Robot extends TimedRobot {
+  // SUBSYSTEMS
+  public static Drive drive;
+
+  // CONTROLLERS
+  public static MacroExecutor executor;
+  private SubsystemManager sm_;
+
   /**
    * This function is run when the robot is first started up and should be
    * used for any initialization code.
    */
   @Override
   public void robotInit() {
+    drive = new Drive();
+
+    sm_ = new SubsystemManager(
+      drive
+    );
+
+    executor = new MacroExecutor(4);
   }
 
   /**
@@ -29,6 +46,8 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
+    sm_.update();
+    sm_.log();
   }
 
  
