@@ -13,61 +13,61 @@ import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 
 public class Drive implements Subsystem {
-    private WPI_TalonSRX leftMaster = new WPI_TalonSRX(Constants.Drive.leftMaster);
-    private WPI_VictorSPX leftSlave1 = new WPI_VictorSPX(Constants.Drive.leftSlave1);
-    private WPI_VictorSPX leftSlave2 = new WPI_VictorSPX(Constants.Drive.leftSlave2);
-    private WPI_TalonSRX rightMaster = new WPI_TalonSRX(Constants.Drive.rightMaster);
-    private WPI_VictorSPX rightSlave1 = new WPI_VictorSPX(Constants.Drive.rightSlave1);
-    private WPI_VictorSPX rightSlave2 = new WPI_VictorSPX(Constants.Drive.rightSlave2);
+    private WPI_TalonSRX leftMaster_ = new WPI_TalonSRX(Constants.Drive.leftMaster);
+    private WPI_VictorSPX leftSlave1_ = new WPI_VictorSPX(Constants.Drive.leftSlave1);
+    private WPI_VictorSPX leftSlave2_ = new WPI_VictorSPX(Constants.Drive.leftSlave2);
+    private WPI_TalonSRX rightMaster_ = new WPI_TalonSRX(Constants.Drive.rightMaster);
+    private WPI_VictorSPX rightSlave1_ = new WPI_VictorSPX(Constants.Drive.rightSlave1);
+    private WPI_VictorSPX rightSlave2_ = new WPI_VictorSPX(Constants.Drive.rightSlave2);
 
     private DifferentialDrive drive_ = new DifferentialDrive(
         new SpeedControllerGroup(
-            leftMaster,
-            leftSlave1,
-            leftSlave2),
+            leftMaster_,
+            leftSlave1_,
+            leftSlave2_),
         new SpeedControllerGroup(
-            rightMaster,
-            rightSlave1,
-            rightSlave2)
+            rightMaster_,
+            rightSlave1_,
+            rightSlave2_)
     );
 
-    private static double leftSpeed_ = 0;
-    private static double rightSpeed_ = 0;
+    private static double turn_ = 0;
+    private static double speed_ = 0;
 
     public Drive(){
-        leftMaster.configFactoryDefault();
-        leftSlave1.configFactoryDefault();
-        leftSlave2.configFactoryDefault();
-        rightMaster.configFactoryDefault();
-        rightSlave1.configFactoryDefault();
-        rightSlave2.configFactoryDefault();
+        leftMaster_.configFactoryDefault();
+        leftSlave1_.configFactoryDefault();
+        leftSlave2_.configFactoryDefault();
+        rightMaster_.configFactoryDefault();
+        rightSlave1_.configFactoryDefault();
+        rightSlave2_.configFactoryDefault();
 
-        leftSlave1.follow(leftMaster);
-        leftSlave2.follow(leftMaster);
-        rightSlave1.follow(rightMaster);
-        rightSlave2.follow(rightMaster);
+        leftSlave1_.follow(leftMaster_);
+        leftSlave2_.follow(leftMaster_);
+        rightSlave1_.follow(rightMaster_);
+        rightSlave2_.follow(rightMaster_);
 
-        leftMaster.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, 1);
-        leftMaster.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative);
+        leftMaster_.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, 1);
+        leftMaster_.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative);
 
-        rightMaster.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, 1);
-        rightMaster.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative);
+        rightMaster_.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, 1);
+        rightMaster_.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative);
 
-        leftMaster.setInverted(true);
-        rightMaster.setInverted(false);
-        leftSlave1.setInverted(InvertType.FollowMaster);
-        leftSlave2.setInverted(InvertType.FollowMaster);
-        rightSlave1.setInverted(InvertType.FollowMaster);
-        rightSlave2.setInverted(InvertType.FollowMaster);
+        leftMaster_.setInverted(true);
+        rightMaster_.setInverted(false);
+        leftSlave1_.setInverted(InvertType.FollowMaster);
+        leftSlave2_.setInverted(InvertType.FollowMaster);
+        rightSlave1_.setInverted(InvertType.FollowMaster);
+        rightSlave2_.setInverted(InvertType.FollowMaster);
     }
 
-    public static void setTank(double left, double right){
-        leftSpeed_ = left;
-        rightSpeed_ = right;
+    public static void setArcade(double turn, double speed){
+        turn_ = turn;
+        speed_ = speed;
     }
 
     @Override public void update(){
-        drive_.tankDrive(leftSpeed_, rightSpeed_);
+        drive_.arcadeDrive(speed_, turn_);
     }
 
     @Override public void start(){}

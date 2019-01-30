@@ -1,16 +1,54 @@
 package frc.team4468.robot;
 
 public class Constants {
-    public class Example {
-        public static final double testVar = 1.0;
+
+    public class System {
+        public static final double dt = 0.02;
     }
 
     public class Drive {
+        // Motors
         public static final int leftMaster = 0;
         public static final int leftSlave1 = 1;
         public static final int leftSlave2 = 2;
         public static final int rightMaster = 3;
         public static final int rightSlave1 = 4;
         public static final int rightSlave2 = 5;
+
+        // PIDs
+        public static final double posP = 0;
+        public static final double posI = 0;
+        public static final double posD = 0;
+        public static final double posF = 0;
+        public static final double velP = 0;
+        public static final double velI = 0;
+        public static final double velD = 0;
+        public static final double velF = 0;
+    }
+
+    public class Hatch {
+        public static final int rotator = 6; // Motor for rotating
+        public static final int pop1 = 0; // solenoid ports
+        public static final int pop2 = 1;
+        public static final int zeroer = 0;
+
+        public static final double kP = 0;
+        public static final double kD = 0;
+        public static final double kF = 0;
+    }
+
+    public class Cargo {
+        public static final int intake = 7;
+        public static final int rotator = 8;
+        public static final int zeroer = 0;
+
+        public static final double kP = 0;
+        public static final double kD = 0;
+        public static final double kF = 0;
+    }
+
+    public class Fourbar {
+        public static final int leftLift = 9;
+        public static final int rightLift = 10;
     }
 }

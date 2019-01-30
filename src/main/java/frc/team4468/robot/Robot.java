@@ -3,7 +3,7 @@ package frc.team4468.robot;
 import edu.wpi.first.wpilibj.TimedRobot;
 import frc.team4468.robot.Lib.SubsystemManager;
 import frc.team4468.robot.Lib.Actions.MacroExecutor;
-import frc.team4468.robot.Subs.Drive;
+import frc.team4468.robot.Subs.*;
 
 
 /**
@@ -15,7 +15,9 @@ import frc.team4468.robot.Subs.Drive;
  */
 public class Robot extends TimedRobot {
   // SUBSYSTEMS
+  public static Cargo cargo;
   public static Drive drive;
+  public static Hatch hatch;
 
   // CONTROLLERS
   public static MacroExecutor executor;
@@ -27,10 +29,14 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotInit() {
+    cargo = new Cargo();
     drive = new Drive();
+    hatch = new Hatch();
 
     sm_ = new SubsystemManager(
-      drive
+      cargo,
+      drive,
+      hatch
     );
 
     executor = new MacroExecutor(4);
