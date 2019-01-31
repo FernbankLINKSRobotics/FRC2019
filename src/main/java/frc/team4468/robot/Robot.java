@@ -40,6 +40,7 @@ public class Robot extends TimedRobot {
     );
 
     executor = new MacroExecutor(4);
+    sm_.start();
   }
 
   /**

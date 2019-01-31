@@ -25,6 +25,7 @@ public class Cargo implements Subsystem {
     };
 
     private Position state_ = Position.RETRACTED;
+    private boolean zeroed_ = false;
     private double angle_ = 0;
     private double speed_ = 0;
 
@@ -62,10 +63,14 @@ public class Cargo implements Subsystem {
     }
 
     @Override public void update(){
+        if(!zeroed_) { state_ = Position.ZEROING; }
         switch(state_) { 
             case ZEROING:
-                rotator_.set(ControlMode.PercentOutput, -0.2);
-                if(limit_.get()) { state_ = Position.RETRACTED; }
+                rotator_.set(ControlMode.PercentOutput, Constants.Cargo.zeroSpeed);
+                if(limit_.get()) {
+                    state_ = Position.RETRACTED;
+                    zeroed_ = true;
+                }
                 break;
             case RETRACTED: angle_ = 180;
             case ROCKET: angle_ = 80;
@@ -74,6 +79,7 @@ public class Cargo implements Subsystem {
                 //TODO: control arm to angle (all that math shiz) 
                 rotator_.set(ControlMode.PercentOutput, armPDF(angle_, rotator_.getSelectedSensorPosition())); 
         }
+        intake_.set(ControlMode.PercentOutput, speed_);
     }
 
     @Override public void stop(){

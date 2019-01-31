@@ -59,6 +59,17 @@ public class Drive implements Subsystem {
         leftSlave2_.setInverted(InvertType.FollowMaster);
         rightSlave1_.setInverted(InvertType.FollowMaster);
         rightSlave2_.setInverted(InvertType.FollowMaster);
+
+        leftMaster_.enableCurrentLimit(true);
+        leftMaster_.configPeakCurrentLimit(40);
+        leftMaster_.configContinuousCurrentLimit(40);
+
+        rightMaster_.enableCurrentLimit(true);
+        rightMaster_.configPeakCurrentLimit(40);
+        rightMaster_.configContinuousCurrentLimit(40);
+
+        leftMaster_.configOpenloopRamp(Constants.Drive.rampRate, Constants.System.CANTimeout);
+        leftMaster_.configOpenloopRamp(Constants.Drive.rampRate, Constants.System.CANTimeout);
     }
 
     public static void setArcade(double turn, double speed){

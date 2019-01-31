@@ -4,6 +4,7 @@ public class Constants {
 
     public class System {
         public static final double dt = 0.02;
+        public static final int CANTimeout = 100;
     }
 
     public class Drive {
@@ -14,7 +15,6 @@ public class Constants {
         public static final int rightMaster = 3;
         public static final int rightSlave1 = 4;
         public static final int rightSlave2 = 5;
-
         // PIDs
         public static final double posP = 0;
         public static final double posI = 0;
@@ -24,6 +24,8 @@ public class Constants {
         public static final double velI = 0;
         public static final double velD = 0;
         public static final double velF = 0;
+        // misc
+        public static final double rampRate = 0.01;
     }
 
     public class Hatch {
@@ -31,7 +33,8 @@ public class Constants {
         public static final int pop1 = 0; // solenoid ports
         public static final int pop2 = 1;
         public static final int zeroer = 0;
-
+        public static final double zeroSpeed = 1;
+        // PDF
         public static final double kP = 0;
         public static final double kD = 0;
         public static final double kF = 0;
@@ -41,7 +44,9 @@ public class Constants {
         public static final int intake = 7;
         public static final int rotator = 8;
         public static final int zeroer = 0;
+        public static final double zeroSpeed = 1;
 
+        // PDF
         public static final double kP = 0;
         public static final double kD = 0;
         public static final double kF = 0;

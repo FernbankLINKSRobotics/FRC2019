@@ -1,4 +1,4 @@
-package frc.team4468.robot.Lib;
+package frc.team4468.robot.Lib.Control;
 
 import edu.wpi.first.hal.util.BoundaryException;
 import edu.wpi.first.wpilibj.Timer;

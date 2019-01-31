@@ -12,8 +12,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.team4468.robot.Constants;
 import frc.team4468.robot.Lib.Subsystem;
 
-import frc.team4468.robot.Lib.Subsystem;
-
 public class Hatch implements Subsystem {
     private WPI_TalonSRX rotator_ = new WPI_TalonSRX(Constants.Hatch.rotator);
     private DoubleSolenoid popper_ = new DoubleSolenoid(Constants.Hatch.pop1, Constants.Hatch.pop2);
@@ -29,6 +27,7 @@ public class Hatch implements Subsystem {
 
     private Position state_ = Position.RETRACTED;
     private Value pop_ = Value.kReverse;
+    private boolean zeroed_ = false;
     private double angle_ = -1;
 
     private double pErr_ = 0; // Previous error
@@ -66,10 +65,16 @@ public class Hatch implements Subsystem {
     }
 
     @Override public void update(){
+        if(!zeroed_) { state_ = Position.ZEROING; }
+        if(popper_.get() != pop_){ popper_.set(pop_); }
+
         switch(state_){
             case ZEROING:
-                rotator_.set(ControlMode.PercentOutput, -0.2);
-                if(limit_.get()) { state_ = Position.RETRACTED; }
+                rotator_.set(ControlMode.PercentOutput, Constants.Hatch.zeroSpeed);
+                if(limit_.get()) {
+                    state_ = Position.RETRACTED;
+                    zeroed_ = true;
+                }
                 break;
             case RETRACTED: angle_ = 135;
             case VERTICLE: angle_ = 90;
