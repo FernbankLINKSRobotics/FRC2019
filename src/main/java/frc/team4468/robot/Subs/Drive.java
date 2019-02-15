@@ -9,7 +9,9 @@ import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 
+import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
+import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 
 public class Drive implements Subsystem {
@@ -19,6 +21,9 @@ public class Drive implements Subsystem {
     private WPI_TalonSRX rightMaster_ = new WPI_TalonSRX(Constants.Drive.rightMaster);
     private WPI_VictorSPX rightSlave1_ = new WPI_VictorSPX(Constants.Drive.rightSlave1);
     private WPI_VictorSPX rightSlave2_ = new WPI_VictorSPX(Constants.Drive.rightSlave2);
+
+    private DoubleSolenoid shifter_ = new DoubleSolenoid(Constants.Drive.shift1, 
+                                                         Constants.Drive.shift2);
 
     private DifferentialDrive drive_ = new DifferentialDrive(
         new SpeedControllerGroup(
@@ -33,6 +38,8 @@ public class Drive implements Subsystem {
 
     private static double turn_ = 0;
     private static double speed_ = 0;
+
+    private static Value shift_ = Value.kOff;
 
     public Drive(){
         leftMaster_.configFactoryDefault();
@@ -72,18 +79,28 @@ public class Drive implements Subsystem {
         leftMaster_.configOpenloopRamp(Constants.Drive.rampRate, Constants.System.CANTimeout);
     }
 
-    public static void setArcade(double turn, double speed){
+    public void setArcade(double turn, double speed){
         turn_ = turn;
         speed_ = speed;
     }
 
-    @Override public void update(){
-        drive_.arcadeDrive(speed_, turn_);
+    public void toggle(boolean high){
+        shift_ = (shift_ == Value.kForward) ? Value.kReverse : Value.kForward;
     }
 
-    @Override public void start(){}
+    @Override public void start(){
+        shift_ = Value.kReverse;
+        shifter_.set(shift_);
+    }
+
+    @Override public void update(){
+        drive_.arcadeDrive(speed_, turn_);
+        if(shifter_.get() != shift_) { shifter_.set(shift_); }
+    }
+
     @Override public void stop(){
         drive_.stopMotor();
+        shifter_.set(Value.kReverse);
     }
     @Override public void log(){}
 }

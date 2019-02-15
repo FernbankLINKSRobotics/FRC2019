@@ -1,27 +1,26 @@
 package frc.team4468.robot;
 
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
+import frc.team4468.robot.Auto.Actions.Pop;
 import frc.team4468.robot.Lib.SubsystemManager;
 import frc.team4468.robot.Lib.Actions.MacroExecutor;
 import frc.team4468.robot.Subs.*;
 
-
-/**
- * The VM is configured to automatically run this class, and to call the
- * functions corresponding to each mode, as described in the TimedRobot
- * documentation. If you change the name of this class or the package after
- * creating this project, you must also update the build.gradle file in the
- * project.
- */
 public class Robot extends TimedRobot {
   // SUBSYSTEMS
   public static Cargo cargo;
   public static Drive drive;
   public static Hatch hatch;
 
-  // CONTROLLERS
-  public static MacroExecutor executor;
+  // MANAGERS
+  private MacroExecutor executor_;
   private SubsystemManager sm_;
+
+  // CONTROLLERS
+  public static Joystick driveJoy = new Joystick(Constants.Input.driver);
+  public static Joystick opJoy = new Joystick(Constants.Input.operator);
+
 
   /**
    * This function is run when the robot is first started up and should be
@@ -39,7 +38,7 @@ public class Robot extends TimedRobot {
       hatch
     );
 
-    executor = new MacroExecutor(4);
+    executor_ = new MacroExecutor(4);
     sm_.start();
   }
 
@@ -62,7 +61,13 @@ public class Robot extends TimedRobot {
   @Override public void autonomousPeriodic() {}
 
   @Override public void teleopInit() {}
-  @Override public void teleopPeriodic() {}
+  @Override public void teleopPeriodic() {
+    // Drive
+    drive.setArcade(driveJoy.getX(), driveJoy.getY());
+
+    // Operator
+    if(opJoy.getTrigger()) executor_.execute("Pop", new Pop());
+  }
 
   @Override public void testInit() {}
   @Override public void testPeriodic() {}
