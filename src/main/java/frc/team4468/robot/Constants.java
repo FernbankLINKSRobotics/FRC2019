@@ -1,6 +1,6 @@
 package frc.team4468.robot;
 
-public class Constants {
+public static class Constants {
 
     public class System {
         public static final double dt = 0.02;
@@ -41,6 +41,8 @@ public class Constants {
         public static final int pop2 = 1;
         public static final int zeroer = 0;
         public static final double zeroSpeed = 0.2;
+        public static final double armRatio = 1/1;
+
         // PDFVA
         public static final double kP = 0;
         public static final double kD = 0;
@@ -76,5 +78,14 @@ public class Constants {
     public class Fourbar {
         public static final int leftLift = 9;
         public static final int rightLift = 10;
+    }
+
+    public class SuperStructure {
+        public static final double cargoSafe = 120;
+        public static final double hatchSafe = 200;
+        public static final double cargoDefault = 90;
+        public static final double hatchDefault = 180;
+        public static final double cargoRetract = 200;
+        public static final double hatchRetract = 220;
     }
 }

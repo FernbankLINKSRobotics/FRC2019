@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 
 public class Drive implements Subsystem {
+    // HARDWARE
     private WPI_TalonSRX leftMaster_ = new WPI_TalonSRX(Constants.Drive.leftMaster);
     private WPI_VictorSPX leftSlave1_ = new WPI_VictorSPX(Constants.Drive.leftSlave1);
     private WPI_VictorSPX leftSlave2_ = new WPI_VictorSPX(Constants.Drive.leftSlave2);
@@ -36,11 +37,13 @@ public class Drive implements Subsystem {
             rightSlave2_)
     );
 
+    // STATE VARIABLES
     private static double turn_ = 0;
     private static double speed_ = 0;
 
     private static Value shift_ = Value.kOff;
 
+    // CONSTRUCTOR
     public Drive(){
         leftMaster_.configFactoryDefault();
         leftSlave1_.configFactoryDefault();
@@ -79,6 +82,7 @@ public class Drive implements Subsystem {
         leftMaster_.configOpenloopRamp(Constants.Drive.rampRate, Constants.System.CANTimeout);
     }
 
+    // INPUT OUTPUT
     public void setArcade(double turn, double speed){
         turn_ = turn;
         speed_ = speed;
@@ -88,6 +92,7 @@ public class Drive implements Subsystem {
         shift_ = (shift_ == Value.kForward) ? Value.kReverse : Value.kForward;
     }
 
+    // SUBSYSTEM IMPL
     @Override public void start(){
         shift_ = Value.kReverse;
         shifter_.set(shift_);

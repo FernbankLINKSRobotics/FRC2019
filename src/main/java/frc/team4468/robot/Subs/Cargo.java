@@ -13,10 +13,12 @@ import frc.team4468.robot.Lib.Control.MotionProfile;
 import frc.team4468.robot.Lib.Control.TrapezoidalProfile;
 
 public class Cargo implements Subsystem {
+    // HARDWARE
     private WPI_VictorSPX intake_ =  new WPI_VictorSPX(Constants.Cargo.intake);
     private WPI_TalonSRX rotator_ = new WPI_TalonSRX(Constants.Cargo.rotator);
     private DigitalInput limit_ = new DigitalInput(Constants.Hatch.zeroer);
 
+    // STATE VARIABLES
     public enum State {
         DISABLED,
         ZERO,
@@ -26,7 +28,7 @@ public class Cargo implements Subsystem {
 
     private State state_ = State.DISABLED;
     private boolean zeroed_ = false;
-    private double angle_ = 0;
+    private double angle_ = 90;
     private double speed_ = 0;
 
     private double pErr_ = 0;
@@ -34,12 +36,14 @@ public class Cargo implements Subsystem {
     MotionProfile motion_ = null;
     private double t_;
 
+    // CONSTUCTOR
     public Cargo() {
         rotator_.configFactoryDefault();
         rotator_.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, 1);
         rotator_.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative);
     }
 
+    // INPUT OUTPUT
     public void setAngle(double theta){
         state_ = State.PID;
         angle_ = theta;
@@ -52,7 +56,14 @@ public class Cargo implements Subsystem {
 
     public void setIntake(double speed){ speed_ = speed; }
 
-    public double armPDF(double set, double angle){
+    public double angle(){
+        return Constants.Cargo.armRatio * rotator_.getSelectedSensorPosition();
+    }
+
+    public boolean zeroed(){ return zeroed_; }
+
+    // HELPER FUNCTS
+    private double armPDF(double set, double angle){
         double err = set - angle;
         double o = (Constants.Cargo.kP * err) +                                   // Power proportinal to error
                    (Constants.Cargo.kD * ((err - pErr_) / Constants.System.dt)) + // Power related to the derivative
@@ -63,7 +74,7 @@ public class Cargo implements Subsystem {
         return o;
     }
 
-    public double armMPFollower(double set, double angle, double vel, double acc){
+    private double armMPFollower(double set, double angle, double vel, double acc){
         double err = set - angle;
         double o = (Constants.Cargo.kmP * err) +                                   // Power proportinal to error
                    (Constants.Cargo.kmD * ((err - pErr_) / Constants.System.dt)) + // Power related to the derivative
@@ -75,11 +86,8 @@ public class Cargo implements Subsystem {
             (o < -1) ? -1 : o;
         return o;
     }
-
-    public double angle(){
-        return Constants.Cargo.armRatio * rotator_.getSelectedSensorPosition();
-    }
     
+    // SUBSYSTEM IMPL
     @Override public void start(){
         state_ = State.ZERO;
         angle_ = 0;

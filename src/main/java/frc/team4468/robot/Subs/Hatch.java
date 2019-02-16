@@ -16,10 +16,12 @@ import frc.team4468.robot.Lib.Control.MotionProfile;
 import frc.team4468.robot.Lib.Control.TrapezoidalProfile;
 
 public class Hatch implements Subsystem {
+    // HARDWARE
     private WPI_TalonSRX rotator_ = new WPI_TalonSRX(Constants.Hatch.rotator);
     private DoubleSolenoid popper_ = new DoubleSolenoid(Constants.Hatch.pop1, Constants.Hatch.pop2);
     private DigitalInput limit_ = new DigitalInput(Constants.Hatch.zeroer);
     
+    // STATE VARIABLES
     public enum State {
         DISABLED,
         ZERO,
@@ -30,12 +32,13 @@ public class Hatch implements Subsystem {
     private State state_ = State.DISABLED;
     private Value pop_ = Value.kReverse;
     private boolean zeroed_ = false;
-    private double angle_ = -1;
+    private double angle_ = 180;
 
     private double pErr_ = 0; // Previous error
     private MotionProfile motion_ = null;
     private double t_ = 0;
 
+    // CONSTRUCT
     public Hatch(){
         rotator_.configFactoryDefault();
         rotator_.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, 1);
@@ -43,6 +46,7 @@ public class Hatch implements Subsystem {
         //rotator_.config_kD(0, 0);
     }
 
+    // INPUT OUTPUT
     public void setAngle(double theta){
         state_ = State.PID;
         angle_ = theta;
@@ -56,9 +60,15 @@ public class Hatch implements Subsystem {
     public void togglePop(){
         pop_ = (popper_.get() == Value.kForward) ? Value.kReverse : Value.kForward;
     }
-    
 
-    public double armPDF(double set, double angle){
+    public double angle(){
+        return Constants.Hatch.armRatio * rotator_.getSelectedSensorPosition();
+    }
+
+    public boolean zeroed(){ return zeroed_; }
+
+    // HELPER FUNCTS
+    private double armPDF(double set, double angle){
         double err = set - angle;
         double o = (Constants.Hatch.kP * err) +                                   // Power proportinal to error
                    (Constants.Hatch.kD * ((err - pErr_) / Constants.System.dt)) + // Power related to the derivative
@@ -69,7 +79,7 @@ public class Hatch implements Subsystem {
         return o;
     }
 
-    public double armMPFollower(double set, double angle, double vel, double acc){
+    private double armMPFollower(double set, double angle, double vel, double acc){
         double err = set - angle;
         double o = (Constants.Hatch.kmP * err) +                                   // Power proportinal to error
                    (Constants.Hatch.kmD * ((err - pErr_) / Constants.System.dt)) + // Power related to the derivative
@@ -82,10 +92,7 @@ public class Hatch implements Subsystem {
         return o;
     }
 
-    public double angle(){
-        return rotator_.getSelectedSensorPosition();
-    }
-
+    // SUBSYSTEM IMPL
     @Override public void start(){
         state_ = State.ZERO;
         pop_ = Value.kReverse;
