@@ -2,10 +2,6 @@ package frc.team4468.robot.Subs;
 
 import frc.team4468.robot.Constants;
 import frc.team4468.robot.Lib.Subsystem;
-
-import com.ctre.phoenix.motorcontrol.FeedbackDevice;
-import com.ctre.phoenix.motorcontrol.InvertType;
-import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 
@@ -38,13 +34,16 @@ public class Drive implements Subsystem {
     );
 
     // STATE VARIABLES
-    private static double turn_ = 0;
-    private static double speed_ = 0;
-
-    private static Value shift_ = Value.kOff;
+    private boolean isTank = false;
+    private double turn_ = 0;
+    private double speed_ = 0;
+    private double lpower_ = 0;
+    private double rpower_ = 0;
+    private Value shift_ = Value.kOff;
 
     // CONSTRUCTOR
     public Drive(){
+        /*
         leftMaster_.configFactoryDefault();
         leftSlave1_.configFactoryDefault();
         leftSlave2_.configFactoryDefault();
@@ -69,6 +68,7 @@ public class Drive implements Subsystem {
         leftSlave2_.setInverted(InvertType.FollowMaster);
         rightSlave1_.setInverted(InvertType.FollowMaster);
         rightSlave2_.setInverted(InvertType.FollowMaster);
+        */
 
         leftMaster_.enableCurrentLimit(true);
         leftMaster_.configPeakCurrentLimit(40);
@@ -79,7 +79,11 @@ public class Drive implements Subsystem {
         rightMaster_.configContinuousCurrentLimit(40);
 
         leftMaster_.configOpenloopRamp(Constants.Drive.rampRate, Constants.System.CANTimeout);
-        leftMaster_.configOpenloopRamp(Constants.Drive.rampRate, Constants.System.CANTimeout);
+        leftSlave1_.configOpenloopRamp(Constants.Drive.rampRate, Constants.System.CANTimeout);
+        leftSlave2_.configOpenloopRamp(Constants.Drive.rampRate, Constants.System.CANTimeout);
+        rightMaster_.configOpenloopRamp(Constants.Drive.rampRate, Constants.System.CANTimeout);
+        rightSlave1_.configOpenloopRamp(Constants.Drive.rampRate, Constants.System.CANTimeout);
+        rightSlave2_.configOpenloopRamp(Constants.Drive.rampRate, Constants.System.CANTimeout);
     }
 
     // INPUT OUTPUT
@@ -87,25 +91,37 @@ public class Drive implements Subsystem {
         turn_ = turn;
         speed_ = speed;
     }
+    public void setTank(double right, double left){
+        rpower_ = right;
+        lpower_ = left;
+    }
 
-    public void toggle(boolean high){
+    public void toggle(){
         shift_ = (shift_ == Value.kForward) ? Value.kReverse : Value.kForward;
+    }
+
+    public void setGear(boolean high){
+        shift_ = (high) ? Value.kForward : Value.kReverse;
     }
 
     // SUBSYSTEM IMPL
     @Override public void start(){
-        shift_ = Value.kReverse;
-        shifter_.set(shift_);
+        //shift_ = Value.kReverse;
+        //shifter_.set(shift_);
     }
 
     @Override public void update(){
-        drive_.arcadeDrive(speed_, turn_);
-        if(shifter_.get() != shift_) { shifter_.set(shift_); }
+        if(isTank){
+            drive_.tankDrive(lpower_, rpower_);
+        } else {
+            drive_.arcadeDrive(speed_, turn_);
+        }
+        //if(shifter_.get() != shift_) { shifter_.set(shift_); }
     }
 
     @Override public void stop(){
         drive_.stopMotor();
-        shifter_.set(Value.kReverse);
+        //shifter_.set(Value.kReverse);
     }
     @Override public void log(){}
 }

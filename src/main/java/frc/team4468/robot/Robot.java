@@ -2,6 +2,9 @@ package frc.team4468.robot;
 
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.GenericHID.Hand;
+import frc.team4468.robot.Auto.Actions.IntakeSpeed;
 import frc.team4468.robot.Auto.Actions.Pop;
 import frc.team4468.robot.Lib.SubsystemManager;
 import frc.team4468.robot.Lib.Actions.MacroExecutor;
@@ -18,8 +21,8 @@ public class Robot extends TimedRobot {
   private SubsystemManager sm_;
 
   // CONTROLLERS
-  public static Joystick driveJoy = new Joystick(Constants.Input.driver);
-  public static Joystick opJoy = new Joystick(Constants.Input.operator);
+  public static XboxController driveJoy = new XboxController(Constants.Input.driver);
+  //public static Joystick opJoy = new Joystick(Constants.Input.operator);
 
 
   /**
@@ -29,13 +32,13 @@ public class Robot extends TimedRobot {
   @Override
   public void robotInit() {
     cargo = new Cargo();
+    //hatch = new Hatch();
     drive = new Drive();
-    hatch = new Hatch();
 
     sm_ = new SubsystemManager(
       cargo,
-      drive,
-      hatch
+      //hatch,
+      drive
     );
 
     executor_ = new MacroExecutor(4);
@@ -62,10 +65,12 @@ public class Robot extends TimedRobot {
   @Override public void teleopInit() {}
   @Override public void teleopPeriodic() {
     // Drive
-    drive.setArcade(driveJoy.getX(), driveJoy.getY());
+    drive.setTank(driveJoy.getY(Hand.kLeft), driveJoy.getY(Hand.kRight));
 
     // Operator
-    if(opJoy.getTrigger()) executor_.execute("Pop", new Pop());
+    if(driveJoy.getRawButton(5)) executor_.execute("Intake", new IntakeSpeed(-.7));
+    if(driveJoy.getRawButton(6)) executor_.execute("Expel", new IntakeSpeed(1));
+
   }
 
   @Override public void testInit() {}

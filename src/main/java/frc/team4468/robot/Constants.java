@@ -1,6 +1,6 @@
 package frc.team4468.robot;
 
-public static class Constants {
+public class Constants {
 
     public class System {
         public static final double dt = 0.02;
@@ -14,12 +14,12 @@ public static class Constants {
 
     public class Drive {
         // Motors
-        public static final int leftMaster = 0;
-        public static final int leftSlave1 = 1;
-        public static final int leftSlave2 = 2;
-        public static final int rightMaster = 3;
-        public static final int rightSlave1 = 4;
-        public static final int rightSlave2 = 5;
+        public static final int leftMaster = 1;
+        public static final int leftSlave1 = 9;
+        public static final int leftSlave2 = 8;
+        public static final int rightMaster = 2;
+        public static final int rightSlave1 = 7;
+        public static final int rightSlave2 = 6;
         // PIDs
         public static final double posP = 0;
         public static final double posI = 0;
@@ -31,17 +31,17 @@ public static class Constants {
         public static final double velF = 0;
         // Misc
         public static final double rampRate = 0.01;
-        public static final int shift1 = 2;
-        public static final int shift2 = 3;
+        public static final int shift1 = 0;
+        public static final int shift2 = 1;
     }
 
     public class Hatch {
-        public static final int rotator = 6; // Motor for rotating
-        public static final int pop1 = 0; // solenoid ports
-        public static final int pop2 = 1;
+        public static final int rotator = 4; // Motor for rotating
+        public static final int pop1 = 2; // solenoid ports
+        public static final int pop2 = 3;
         public static final int zeroer = 0;
         public static final double zeroSpeed = 0.2;
-        public static final double armRatio = 1/1;
+        public static final double armRatio = 18/22;
 
         // PDFVA
         public static final double kP = 0;
@@ -57,8 +57,8 @@ public static class Constants {
     }
 
     public class Cargo {
-        public static final int intake = 7;
-        public static final int rotator = 8;
+        public static final int intake = 5;
+        public static final int rotator = 3;
         public static final int zeroer = 0;
         public static final double zeroSpeed = 0.2;
         public static final double armRatio = 24/84;
