@@ -8,8 +8,9 @@ public class Constants {
     }
 
     public class Input {
-        public static final int driver = 0;
-        public static final int operator = 0;
+        public static final int driveLeft = 0;
+        public static final int driveRight = 1;
+        public static final int operator = 2;
     }
 
     public class Drive {
@@ -30,14 +31,14 @@ public class Constants {
         public static final double velD = 0;
         public static final double velF = 0;
         // Misc
-        public static final double rampRate = 0.01;
-        public static final int shift1 = 0;
-        public static final int shift2 = 1;
+        public static final double rampRate = 0.1;
+        public static final int shift1 = 1;
+        public static final int shift2 = 2;
     }
 
     public class Hatch {
         public static final int rotator = 4; // Motor for rotating
-        public static final int pop1 = 2; // solenoid ports
+        public static final int pop1 = 0; // solenoid ports
         public static final int pop2 = 3;
         public static final int zeroer = 0;
         public static final double zeroSpeed = 0.2;
@@ -59,7 +60,7 @@ public class Constants {
     public class Cargo {
         public static final int intake = 5;
         public static final int rotator = 3;
-        public static final int zeroer = 0;
+        public static final int zeroer = 1;
         public static final double zeroSpeed = 0.2;
         public static final double armRatio = 24/84;
         // PDFVA

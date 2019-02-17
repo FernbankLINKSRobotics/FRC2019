@@ -33,6 +33,7 @@ public class Hatch implements Subsystem {
     private Value pop_ = Value.kReverse;
     private boolean zeroed_ = false;
     private double angle_ = 180;
+    private double pow_ = 0;
 
     private double pErr_ = 0; // Previous error
     private MotionProfile motion_ = null;
@@ -41,8 +42,8 @@ public class Hatch implements Subsystem {
     // CONSTRUCT
     public Hatch(){
         rotator_.configFactoryDefault();
-        rotator_.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, 1);
         rotator_.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative);
+        rotator_.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, 1);
         //rotator_.config_kD(0, 0);
     }
 
@@ -61,8 +62,16 @@ public class Hatch implements Subsystem {
         pop_ = (popper_.get() == Value.kForward) ? Value.kReverse : Value.kForward;
     }
 
+    public void setGear(boolean b){
+        pop_ = (b) ? Value.kForward : Value.kReverse;
+    }
+
     public double angle(){
         return Constants.Hatch.armRatio * rotator_.getSelectedSensorPosition();
+    }
+
+    public void setPower(double p){
+        pow_ = p;
     }
 
     public boolean zeroed(){ return zeroed_; }
@@ -98,10 +107,15 @@ public class Hatch implements Subsystem {
         pop_ = Value.kReverse;
     }
 
+
+    int c = 0;
+    boolean hi = false;
     @Override public void update(){
         if(!zeroed_) { state_ = State.ZERO; }
         if(popper_.get() != pop_){ popper_.set(pop_); }
 
+        rotator_.set(ControlMode.PercentOutput, pow_);
+        /*
         switch(state_){
             case ZERO:
                 rotator_.set(ControlMode.PercentOutput, Constants.Hatch.zeroSpeed);
@@ -136,6 +150,7 @@ public class Hatch implements Subsystem {
                 }
                 break;
         }
+        */
     }
 
     @Override public void stop(){
@@ -143,10 +158,5 @@ public class Hatch implements Subsystem {
         popper_.set(Value.kReverse);
     }
 
-    @Override public void log(){
-        SmartDashboard.putBoolean("IS ZEROING", state_ == State.ZERO);
-        SmartDashboard.putBoolean("IS POPPED", popper_.get() == Value.kForward);
-        SmartDashboard.putNumber("ANGLE", angle_);
-        SmartDashboard.putNumber("Motor speed", rotator_.get());
-    }
+    @Override public void log(){}
 }

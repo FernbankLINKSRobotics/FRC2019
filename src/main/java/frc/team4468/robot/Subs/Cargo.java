@@ -16,7 +16,8 @@ public class Cargo implements Subsystem {
     // HARDWARE
     private WPI_VictorSPX intake_ =  new WPI_VictorSPX(Constants.Cargo.intake);
     private WPI_TalonSRX rotator_ = new WPI_TalonSRX(Constants.Cargo.rotator);
-    private DigitalInput limit_ = new DigitalInput(Constants.Hatch.zeroer);
+    private DigitalInput limit_ = new DigitalInput(Constants.Cargo.zeroer);
+    
 
     // STATE VARIABLES
     public enum State {
@@ -30,6 +31,8 @@ public class Cargo implements Subsystem {
     private boolean zeroed_ = false;
     private double angle_ = 90;
     private double speed_ = 0;
+    private double rot_= 0;
+
 
     private double pErr_ = 0;
 
@@ -39,8 +42,9 @@ public class Cargo implements Subsystem {
     // CONSTUCTOR
     public Cargo() {
         rotator_.configFactoryDefault();
-        rotator_.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, 1);
+        //rotator_.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, 1);
         rotator_.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative);
+        rotator_.setSelectedSensorPosition(0, 0, 10);
     }
 
     // INPUT OUTPUT
@@ -57,7 +61,11 @@ public class Cargo implements Subsystem {
     public void setIntake(double speed){ speed_ = speed; }
 
     public double angle(){
-        return Constants.Cargo.armRatio * rotator_.getSelectedSensorPosition();
+        return Constants.Cargo.armRatio * rotator_.getSelectedSensorPosition(0);
+    }
+
+    public void setPower(double pow){
+        rot_ = pow;
     }
 
     public boolean zeroed(){ return zeroed_; }
@@ -95,6 +103,9 @@ public class Cargo implements Subsystem {
 
     @Override public void update(){
         if(!zeroed_) { state_ = State.ZERO; }
+        System.out.println("Zero: " + !limit_.get());
+        System.out.println("Angle: " + rotator_.getSelectedSensorPosition(0));
+        
         switch(state_){
             case ZERO:
                 rotator_.set(ControlMode.PercentOutput, Constants.Cargo.zeroSpeed);
@@ -129,6 +140,9 @@ public class Cargo implements Subsystem {
                 }
                 break;
         }
+        
+        System.out.println(rot_);
+        rotator_.set(ControlMode.PercentOutput, rot_);
         intake_.set(ControlMode.PercentOutput, speed_);
     }
 

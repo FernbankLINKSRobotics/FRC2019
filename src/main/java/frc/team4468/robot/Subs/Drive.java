@@ -90,10 +90,12 @@ public class Drive implements Subsystem {
     public void setArcade(double turn, double speed){
         turn_ = turn;
         speed_ = speed;
+        isTank = false;
     }
     public void setTank(double right, double left){
         rpower_ = right;
         lpower_ = left;
+        isTank = true;
     }
 
     public void toggle(){
@@ -116,12 +118,13 @@ public class Drive implements Subsystem {
         } else {
             drive_.arcadeDrive(speed_, turn_);
         }
-        //if(shifter_.get() != shift_) { shifter_.set(shift_); }
+        if(shifter_.get() != shift_) { shifter_.set(shift_); }
     }
 
     @Override public void stop(){
         drive_.stopMotor();
         //shifter_.set(Value.kReverse);
     }
-    @Override public void log(){}
+    @Override public void log(){
+    }
 }

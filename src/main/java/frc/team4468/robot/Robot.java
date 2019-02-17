@@ -1,12 +1,12 @@
 package frc.team4468.robot;
 
-import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
-import frc.team4468.robot.Auto.Actions.IntakeSpeed;
-import frc.team4468.robot.Auto.Actions.Pop;
+import frc.team4468.robot.Lib.Input.JoystickRunner;
 import frc.team4468.robot.Lib.SubsystemManager;
+import frc.team4468.robot.Lib.Input.XboxRunner;
 import frc.team4468.robot.Lib.Actions.MacroExecutor;
 import frc.team4468.robot.Subs.*;
 
@@ -21,9 +21,9 @@ public class Robot extends TimedRobot {
   private SubsystemManager sm_;
 
   // CONTROLLERS
-  public static XboxController driveJoy = new XboxController(Constants.Input.driver);
-  //public static Joystick opJoy = new Joystick(Constants.Input.operator);
-
+  public static XboxRunner operator = new XboxRunner(Constants.Input.operator);
+  public static JoystickRunner leftDrive = new JoystickRunner(Constants.Input.driveLeft);
+  public static JoystickRunner rightDrive = new JoystickRunner(Constants.Input.driveRight);
 
   /**
    * This function is run when the robot is first started up and should be
@@ -32,12 +32,12 @@ public class Robot extends TimedRobot {
   @Override
   public void robotInit() {
     cargo = new Cargo();
-    //hatch = new Hatch();
+    hatch = new Hatch();
     drive = new Drive();
 
     sm_ = new SubsystemManager(
       cargo,
-      //hatch,
+      hatch,
       drive
     );
 
@@ -62,15 +62,21 @@ public class Robot extends TimedRobot {
   @Override public void autonomousInit() {}
   @Override public void autonomousPeriodic() {}
 
-  @Override public void teleopInit() {}
+  @Override public void teleopInit() {
+    //hatch.setGear(true);
+  }
   @Override public void teleopPeriodic() {
     // Drive
-    drive.setTank(driveJoy.getY(Hand.kLeft), driveJoy.getY(Hand.kRight));
+    drive.setTank(leftDrive.getY(), rightDrive.getY());
+    leftDrive.whenTriggerPressed(() -> drive.setGear(true));
+    rightDrive.whenTriggerPressed(() -> drive.setGear(true));
 
     // Operator
-    if(driveJoy.getRawButton(5)) executor_.execute("Intake", new IntakeSpeed(-.7));
-    if(driveJoy.getRawButton(6)) executor_.execute("Expel", new IntakeSpeed(1));
-
+    cargo.setPower(operator.getY(Hand.kLeft));
+    cargo.setIntake(-1 * operator.getTriggerAxis(Hand.kLeft));
+    cargo.setIntake(operator.getTriggerAxis(Hand.kRight));
+    operator.whenPressed(4, () -> hatch.setGear(true));
+    operator.whenPressed(5, () -> hatch.setGear(false));
   }
 
   @Override public void testInit() {}
