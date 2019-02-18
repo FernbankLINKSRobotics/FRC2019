@@ -86,7 +86,7 @@ public class Drive implements Subsystem {
         rightSlave2_.configOpenloopRamp(Constants.Drive.rampRate, Constants.System.CANTimeout);
     }
 
-    // INPUT OUTPUT
+    // PUBLIC INPUT OUTPUT
     public void setArcade(double turn, double speed){
         turn_ = turn;
         speed_ = speed;

@@ -12,6 +12,7 @@ import frc.team4468.robot.Subs.*;
 
 public class Robot extends TimedRobot {
   // SUBSYSTEMS
+  public static SuperStructure struc;
   public static Cargo cargo;
   public static Drive drive;
   public static Hatch hatch;
@@ -21,21 +22,19 @@ public class Robot extends TimedRobot {
   private SubsystemManager sm_;
 
   // CONTROLLERS
-  public static XboxRunner operator = new XboxRunner(Constants.Input.operator);
-  public static JoystickRunner leftDrive = new JoystickRunner(Constants.Input.driveLeft);
   public static JoystickRunner rightDrive = new JoystickRunner(Constants.Input.driveRight);
+  public static JoystickRunner leftDrive  = new JoystickRunner(Constants.Input.driveLeft);
+  public static XboxRunner operator = new XboxRunner(Constants.Input.operator);
 
-  /**
-   * This function is run when the robot is first started up and should be
-   * used for any initialization code.
-   */
-  @Override
-  public void robotInit() {
+  // ROBOT
+  @Override public void robotInit() {
+    struc = new SuperStructure();
     cargo = new Cargo();
     hatch = new Hatch();
     drive = new Drive();
 
     sm_ = new SubsystemManager(
+      struc,
       cargo,
       hatch,
       drive
@@ -43,42 +42,32 @@ public class Robot extends TimedRobot {
 
     executor_ = new MacroExecutor(4);
   }
-
-  /**
-   * This function is called every robot packet, no matter the mode. Use
-   * this for items like diagnostics that you want ran during disabled,
-   * autonomous, teleoperated and test.
-   *
-   * <p>This runs after the mode specific periodic functions, but before
-   * LiveWindow and SmartDashboard integrated updating.
-   */
-  @Override
-  public void robotPeriodic() {
-    sm_.update();
-    sm_.log();
-  }
-
  
-  @Override public void autonomousInit() {}
-  @Override public void autonomousPeriodic() {}
+  @Override public void teleopInit() { start(); }
+  @Override public void autonomousInit() { start(); }
+  @Override public void teleopPeriodic() { periodic(); }
+  @Override public void autonomousPeriodic() { periodic(); }
 
-  @Override public void teleopInit() {
-    //hatch.setGear(true);
+
+  @Override public void testInit() {}
+  @Override public void testPeriodic() {}
+
+  private void start(){
+    sm_.start();
   }
-  @Override public void teleopPeriodic() {
+
+  private void periodic(){
     // Drive
-    drive.setTank(leftDrive.getY(), rightDrive.getY());
+    drive.setTank(-leftDrive.getY(), -rightDrive.getY());
     leftDrive.whenTriggerPressed(() -> drive.setGear(true));
     rightDrive.whenTriggerPressed(() -> drive.setGear(true));
 
     // Operator
-    cargo.setPower(operator.getY(Hand.kLeft));
-    cargo.setIntake(-1 * operator.getTriggerAxis(Hand.kLeft));
-    cargo.setIntake(operator.getTriggerAxis(Hand.kRight));
-    operator.whenPressed(4, () -> hatch.setGear(true));
+    cargo.setIntake(operator.getY(Hand.kLeft));
+    operator.whenPressed(6, () -> hatch.setGear(true));
     operator.whenPressed(5, () -> hatch.setGear(false));
+    operator.whenPressed(4, () -> cargo.setAngle(130));
+    operator.whenPressed(2, () -> cargo.setAngle(85));
+    operator.whenPressed(1, () -> cargo.setAngle(90));
   }
-
-  @Override public void testInit() {}
-  @Override public void testPeriodic() {}
 }

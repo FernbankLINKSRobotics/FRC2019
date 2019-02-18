@@ -28,29 +28,25 @@ public class Cargo implements Subsystem {
     }
 
     private State state_ = State.DISABLED;
+    private MotionProfile motion_ = null;
     private boolean zeroed_ = false;
     private double angle_ = 90;
     private double speed_ = 0;
-    private double rot_= 0;
-
-
     private double pErr_ = 0;
-
-    MotionProfile motion_ = null;
-    private double t_;
+    private double t_ = 0;
 
     // CONSTUCTOR
     public Cargo() {
         rotator_.configFactoryDefault();
-        //rotator_.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, 1);
         rotator_.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative);
-        rotator_.setSelectedSensorPosition(0, 0, 10);
+        rotator_.enableVoltageCompensation(true);
     }
 
-    // INPUT OUTPUT
+    // PUBLIC INPUT OUTPUT
     public void setAngle(double theta){
         state_ = State.PID;
         angle_ = theta;
+        System.out.println("angle: " + angle_);
     }
 
     public void setAngleMotion(double theta){
@@ -61,25 +57,21 @@ public class Cargo implements Subsystem {
     public void setIntake(double speed){ speed_ = speed; }
 
     public double angle(){
-        return Constants.Cargo.armRatio * rotator_.getSelectedSensorPosition(0);
-    }
-
-    public void setPower(double pow){
-        rot_ = pow;
+        return ticksToAngle(rotator_.getSelectedSensorPosition(0));
     }
 
     public boolean zeroed(){ return zeroed_; }
 
-    // HELPER FUNCTS
+    // PRIVATE HELPER FUNCTS
     private double armPDF(double set, double angle){
         double err = set - angle;
         double o = (Constants.Cargo.kP * err) +                                   // Power proportinal to error
                    (Constants.Cargo.kD * ((err - pErr_) / Constants.System.dt)) + // Power related to the derivative
-                   (Constants.Cargo.kF * Math.cos(angle * (Math.PI/ 180)));       // Power to counteract gravity
+                   (Constants.Cargo.kF * Math.sin(angle * (Math.PI/ 180)));       // Power to counteract gravity
         pErr_ = err;
         o = (o >  1) ? 1 :     // clamps the range to -1 to 1
             (o < -1) ? -1 : o;
-        return o;
+        return -o;
     }
 
     private double armMPFollower(double set, double angle, double vel, double acc){
@@ -92,24 +84,37 @@ public class Cargo implements Subsystem {
         pErr_ = err;
         o = (o >  1) ? 1 :     // clamps the range to -1 to 1
             (o < -1) ? -1 : o;
-        return o;
+        return -o;
     }
+
+    private int angleToTicks(double angle){
+        return (int)(angle * (4096/(360 * Constants.Cargo.armRatio)));
+    }
+
+    private double ticksToAngle(int ticks){
+        return ticks * ((360 * Constants.Cargo.armRatio)/4096);
+    }
+
     
     // SUBSYSTEM IMPL
     @Override public void start(){
         state_ = State.ZERO;
-        angle_ = 0;
+        angle_ = 90;
     }
 
     @Override public void update(){
         if(!zeroed_) { state_ = State.ZERO; }
-        System.out.println("Zero: " + !limit_.get());
-        System.out.println("Angle: " + rotator_.getSelectedSensorPosition(0));
+        //System.out.println("Zero: " + !limit_.get());
+        //System.out.println("Angle: " + angle());
+        //System.out.println("Error: " + (angle_ - angle()));
+        //System.out.println("Ticks: " + rotator_.getSelectedSensorPosition(0));
+        //System.out.println("Target: " + angle_);
         
         switch(state_){
             case ZERO:
                 rotator_.set(ControlMode.PercentOutput, Constants.Cargo.zeroSpeed);
-                if(limit_.get()) {
+                if(!limit_.get()) {
+                    rotator_.setSelectedSensorPosition(angleToTicks(Constants.Cargo.zeroAngle), 0, 10);
                     state_ = State.PID;
                     zeroed_ = true;
                 }
@@ -118,8 +123,7 @@ public class Cargo implements Subsystem {
                 rotator_.stopMotor();
                 break;
             case PID:
-                rotator_.set(ControlMode.PercentOutput,
-                             armPDF(angle_, angle()));
+                rotator_.set(ControlMode.PercentOutput, armPDF(angle_, angle()));
                 break;
             case MP:
                 if(motion_ == null){
@@ -141,8 +145,6 @@ public class Cargo implements Subsystem {
                 break;
         }
         
-        System.out.println(rot_);
-        rotator_.set(ControlMode.PercentOutput, rot_);
         intake_.set(ControlMode.PercentOutput, speed_);
     }
 

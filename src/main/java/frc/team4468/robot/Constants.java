@@ -43,6 +43,8 @@ public class Constants {
         public static final int zeroer = 0;
         public static final double zeroSpeed = 0.2;
         public static final double armRatio = 18/22;
+        public static final double offset = 20;
+        public static final double zeroAngle = 200;
 
         // PDFVA
         public static final double kP = 0;
@@ -61,14 +63,15 @@ public class Constants {
         public static final int intake = 5;
         public static final int rotator = 3;
         public static final int zeroer = 1;
-        public static final double zeroSpeed = 0.2;
-        public static final double armRatio = 24/84;
+        public static final double zeroSpeed = 0.25;
+        public static final double armRatio = 0.285714;//(24/84);
+        public static final double zeroAngle = 82;
         // PDFVA
-        public static final double kP = 0;
-        public static final double kD = 0;
+        public static final double kP = .018;
+        public static final double kD = .0001;
         public static final double kmP = 0;
         public static final double kmD = 0;
-        public static final double kF = 0;
+        public static final double kF = .25;
         public static final double kV = 0;
         public static final double kA = 0;
         // Motion Profile

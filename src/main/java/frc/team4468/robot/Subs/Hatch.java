@@ -33,21 +33,19 @@ public class Hatch implements Subsystem {
     private Value pop_ = Value.kReverse;
     private boolean zeroed_ = false;
     private double angle_ = 180;
-    private double pow_ = 0;
 
     private double pErr_ = 0; // Previous error
     private MotionProfile motion_ = null;
     private double t_ = 0;
 
-    // CONSTRUCT
+    // CONSTRUCTOR
     public Hatch(){
         rotator_.configFactoryDefault();
         rotator_.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative);
-        rotator_.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, 1);
-        //rotator_.config_kD(0, 0);
+        rotator_.enableVoltageCompensation(true);
     }
 
-    // INPUT OUTPUT
+    // PUBLIC INPUT OUTPUT
     public void setAngle(double theta){
         state_ = State.PID;
         angle_ = theta;
@@ -67,16 +65,12 @@ public class Hatch implements Subsystem {
     }
 
     public double angle(){
-        return Constants.Hatch.armRatio * rotator_.getSelectedSensorPosition();
-    }
-
-    public void setPower(double p){
-        pow_ = p;
+        return ticksToAngle(rotator_.getSelectedSensorPosition(0));
     }
 
     public boolean zeroed(){ return zeroed_; }
 
-    // HELPER FUNCTS
+    // PRIVATE HELPER FUNCTS
     private double armPDF(double set, double angle){
         double err = set - angle;
         double o = (Constants.Hatch.kP * err) +                                   // Power proportinal to error
@@ -92,7 +86,8 @@ public class Hatch implements Subsystem {
         double err = set - angle;
         double o = (Constants.Hatch.kmP * err) +                                   // Power proportinal to error
                    (Constants.Hatch.kmD * ((err - pErr_) / Constants.System.dt)) + // Power related to the derivative
-                   (Constants.Hatch.kF * Math.cos(angle * (Math.PI/ 180))) +       // Power to counteract gravity
+                   (Constants.Hatch.kF * Math.cos((angle * (Math.PI/ 180)) 
+                                                   + Constants.Hatch.offset)) +    // Power to counteract gravity
                    (Constants.Hatch.kV * vel) +
                    (Constants.Hatch.kA * acc);
         pErr_ = err;
@@ -101,26 +96,30 @@ public class Hatch implements Subsystem {
         return o;
     }
 
+    private int angleToTicks(double angle){
+        return (int)(angle * (4096/(360 * Constants.Hatch.armRatio)));
+    }
+
+    private double ticksToAngle(int ticks){
+        return ticks * ((360 * Constants.Hatch.armRatio)/4096);
+    }
+
     // SUBSYSTEM IMPL
     @Override public void start(){
         state_ = State.ZERO;
         pop_ = Value.kReverse;
     }
 
-
-    int c = 0;
-    boolean hi = false;
     @Override public void update(){
         if(!zeroed_) { state_ = State.ZERO; }
         if(popper_.get() != pop_){ popper_.set(pop_); }
 
-        rotator_.set(ControlMode.PercentOutput, pow_);
-        /*
         switch(state_){
             case ZERO:
                 rotator_.set(ControlMode.PercentOutput, Constants.Hatch.zeroSpeed);
                 if(limit_.get()) {
                     state_ = State.PID;
+                    rotator_.setSelectedSensorPosition(angleToTicks(Constants.Hatch.zeroAngle), 0, 10);
                     zeroed_ = true;
                 }
                 break;
@@ -150,7 +149,6 @@ public class Hatch implements Subsystem {
                 }
                 break;
         }
-        */
     }
 
     @Override public void stop(){

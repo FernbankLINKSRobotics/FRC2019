@@ -1,12 +1,19 @@
 package frc.team4468.robot.Subs;
 
 import frc.team4468.robot.Lib.Subsystem;
+import edu.wpi.first.wpilibj.Compressor;
+import edu.wpi.first.wpilibj.PowerDistributionPanel;
+import edu.wpi.first.wpilibj.RobotController;
 import frc.team4468.robot.Constants;
 import frc.team4468.robot.Robot;
 
 public class SuperStructure implements Subsystem {
+    // HARDWARE
+    Compressor comp_ = new Compressor();
+    PowerDistributionPanel pdp_ = new PowerDistributionPanel();
+
     // STATE VARIABLES
-    public enum State {
+    public enum Manipulators {
         START,
         RETRACT,
         DEFAULT,
@@ -15,34 +22,34 @@ public class SuperStructure implements Subsystem {
         DISABLED
     };
 
-    private State state_ = State.DISABLED;
-    private double hatchTarget;
-    private double cargoTarget;
+    private Manipulators manipulators_ = Manipulators.DISABLED;
     private boolean hatchStarted = false;
     private boolean cargoStarted = false;
+    private double hatchTarget;
+    private double cargoTarget;
 
-    // INPUTS OUTPUTS
-    public void retractConfig(){ state_ = State.RETRACT; }
-    public void defaultConfig(){ state_ = State.DEFAULT; }
-    public void hatchAngle(double theta){
-        state_ = State.MOVE_HATCH;
+    // PUBLIC INPUTS OUTPUTS
+    public void retract(){ manipulators_ = Manipulators.RETRACT; }
+    public void disable(){ manipulators_ = Manipulators.DEFAULT; }
+    public void setHatch(double theta){
+        manipulators_ = Manipulators.MOVE_HATCH;
         hatchTarget = theta;
     }
-    public void cargoAngle(double theta){
-        state_ = State.MOVE_CARGO;
+    public void setCargo(double theta){
+        manipulators_ = Manipulators.MOVE_CARGO;
         cargoTarget = theta;
     }
 
-    // HELPER FUNCTS
+    // PRIVATE HELPER FUNCTS
     private boolean hatchSafe() { return (Robot.hatch.angle() <= Constants.SuperStructure.hatchSafe); }
     private boolean cargoSafe() { return (Robot.cargo.angle() <= Constants.SuperStructure.cargoSafe); }
 
     // SUBSYSTEM IMPL
     @Override public void update(){
-        switch(state_){
+        switch(manipulators_){
             case START:
                 if(Robot.cargo.zeroed() && Robot.hatch.zeroed()){ // Arms are safe when ZEROED
-                    state_ = State.DEFAULT;
+                    manipulators_ = Manipulators.DEFAULT;
                     break;
                 }
                 if(!cargoStarted){ Robot.cargo.start(); }
@@ -88,18 +95,20 @@ public class SuperStructure implements Subsystem {
             break;
 
             case DISABLED:
-                Robot.cargo.stop();
-                Robot.hatch.stop();
+                //Robot.cargo.stop();
+                //Robot.hatch.stop();
             break;
         }
     }
 
     @Override public void start(){
-        state_ = State.START;
+        manipulators_ = Manipulators.DISABLED;
+        comp_.clearAllPCMStickyFaults();
+        pdp_.clearStickyFaults();
     }
 
     @Override public void stop(){
-        state_ = State.DISABLED;
+        manipulators_ = Manipulators.DISABLED;
     }
 
     @Override public void log(){}
