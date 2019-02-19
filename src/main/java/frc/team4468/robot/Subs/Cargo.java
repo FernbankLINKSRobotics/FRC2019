@@ -1,7 +1,6 @@
 package frc.team4468.robot.Subs;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
-import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 
@@ -78,7 +77,7 @@ public class Cargo implements Subsystem {
         double err = set - angle;
         double o = (Constants.Cargo.kmP * err) +                                   // Power proportinal to error
                    (Constants.Cargo.kmD * ((err - pErr_) / Constants.System.dt)) + // Power related to the derivative
-                   (Constants.Cargo.kF * Math.cos(angle * (Math.PI/ 180))) +       // Power to counteract gravity
+                   (Constants.Cargo.kF * Math.sin(angle * (Math.PI/ 180))) +       // Power to counteract gravity
                    (Constants.Cargo.kV * vel) +                                    // Feed forward for velocity
                    (Constants.Cargo.kA * acc);                                     // Feed forward for acceleration
         pErr_ = err;

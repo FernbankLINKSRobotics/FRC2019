@@ -28,4 +28,18 @@ public class XboxRunner extends HIDRunner {
           return getRawAxis(3);
         }
       }
+
+    public void whenTriggerThreshold(Hand hand, double thres, Runnable f1){
+      if(getTriggerAxis(hand) > thres){
+        f1.run();
+      }
+    }
+
+    public void whenTriggerThreshold(Hand hand, double thres, Runnable f1, Runnable f2){
+      if(getTriggerAxis(hand) > thres){
+        f1.run();
+      } else {
+        f2.run();
+      }
+    }
 }

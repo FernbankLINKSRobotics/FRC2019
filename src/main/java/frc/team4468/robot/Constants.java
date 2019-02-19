@@ -34,24 +34,25 @@ public class Constants {
         public static final double rampRate = 0.1;
         public static final int shift1 = 1;
         public static final int shift2 = 2;
+        public static final double wheelDiameter = 6;
     }
 
     public class Hatch {
         public static final int rotator = 4; // Motor for rotating
         public static final int pop1 = 0; // solenoid ports
         public static final int pop2 = 3;
-        public static final int zeroer = 0;
-        public static final double zeroSpeed = 0.2;
-        public static final double armRatio = 18/22;
-        public static final double offset = 20;
-        public static final double zeroAngle = 200;
+        public static final int zeroer = 2;
+        public static final double zeroSpeed = -0.1;
+        public static final double armRatio = 1;
+        public static final double offset = -45;
+        public static final double zeroAngle = 242;
 
         // PDFVA
-        public static final double kP = 0;
-        public static final double kD = 0;
+        public static final double kP = 0.008;
+        public static final double kD = 0.0003;
         public static final double kmP = 0;
         public static final double kmD = 0;
-        public static final double kF = 0;
+        public static final double kF = -0.12;
         public static final double kV = 0;
         public static final double kA = 0;
         // Motion Profile
@@ -91,5 +92,7 @@ public class Constants {
         public static final double hatchDefault = 180;
         public static final double cargoRetract = 200;
         public static final double hatchRetract = 220;
+        public static final double warningPower = 180;
+        public static final double driveModifier = .7;
     }
 }

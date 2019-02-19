@@ -43,6 +43,7 @@ public class Hatch implements Subsystem {
         rotator_.configFactoryDefault();
         rotator_.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative);
         rotator_.enableVoltageCompensation(true);
+        rotator_.setInverted(true);
     }
 
     // PUBLIC INPUT OUTPUT
@@ -64,11 +65,19 @@ public class Hatch implements Subsystem {
         pop_ = (b) ? Value.kForward : Value.kReverse;
     }
 
+    public boolean isPoped(){
+        return popper_.get() == Value.kForward;
+    }
+
     public double angle(){
         return ticksToAngle(rotator_.getSelectedSensorPosition(0));
     }
 
     public boolean zeroed(){ return zeroed_; }
+
+    public void reset(){
+        rotator_.setSelectedSensorPosition(0, 0, 10);
+    }
 
     // PRIVATE HELPER FUNCTS
     private double armPDF(double set, double angle){
@@ -79,7 +88,7 @@ public class Hatch implements Subsystem {
         pErr_ = err;
         o = (o >  1) ? 1 :     // clamps the range to -1 to 1
             (o < -1) ? -1 : o;
-        return o;
+        return -o;
     }
 
     private double armMPFollower(double set, double angle, double vel, double acc){
@@ -93,7 +102,7 @@ public class Hatch implements Subsystem {
         pErr_ = err;
         o = (o >  1) ? 1 :     // clamps the range to -1 to 1
             (o < -1) ? -1 : o;
-        return o;
+        return -o;
     }
 
     private int angleToTicks(double angle){
@@ -108,16 +117,22 @@ public class Hatch implements Subsystem {
     @Override public void start(){
         state_ = State.ZERO;
         pop_ = Value.kReverse;
+        angle_ = 180;
     }
 
     @Override public void update(){
         if(!zeroed_) { state_ = State.ZERO; }
-        if(popper_.get() != pop_){ popper_.set(pop_); }
+        popper_.set(pop_);
 
+        //System.out.println("Error: " + (angle_ - angle()));
+        //System.out.println("Ticks: " + rotator_.getSelectedSensorPosition(0));
+        //System.out.println("Target: " + angle_)
+        //System.out.println("State: " + (state_ == State.PID));
+        
         switch(state_){
             case ZERO:
                 rotator_.set(ControlMode.PercentOutput, Constants.Hatch.zeroSpeed);
-                if(limit_.get()) {
+                if(!limit_.get()) {
                     state_ = State.PID;
                     rotator_.setSelectedSensorPosition(angleToTicks(Constants.Hatch.zeroAngle), 0, 10);
                     zeroed_ = true;
@@ -127,8 +142,10 @@ public class Hatch implements Subsystem {
                 rotator_.stopMotor();
                 break;
             case PID:
+                double out = armPDF(angle_, angle());
+                System.out.println(out);
                 rotator_.set(ControlMode.PercentOutput,
-                             armPDF(angle_, angle()));
+                             out);
                 break;
             case MP:
                 if(motion_ == null){
@@ -149,6 +166,8 @@ public class Hatch implements Subsystem {
                 }
                 break;
         }
+
+        //rotator_.set(ControlMode.PercentOutput, -0.1);
     }
 
     @Override public void stop(){
@@ -156,5 +175,8 @@ public class Hatch implements Subsystem {
         popper_.set(Value.kReverse);
     }
 
-    @Override public void log(){}
+    @Override public void log(){
+        //System.out.println("Zero: " + !limit_.get());
+        //System.out.println("Angle: " + angle());
+    }
 }

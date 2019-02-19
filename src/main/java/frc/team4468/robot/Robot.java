@@ -1,8 +1,6 @@
 package frc.team4468.robot;
 
-import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 import frc.team4468.robot.Lib.Input.JoystickRunner;
 import frc.team4468.robot.Lib.SubsystemManager;
@@ -34,7 +32,7 @@ public class Robot extends TimedRobot {
     drive = new Drive();
 
     sm_ = new SubsystemManager(
-      struc,
+      //struc,
       cargo,
       hatch,
       drive
@@ -42,7 +40,11 @@ public class Robot extends TimedRobot {
 
     executor_ = new MacroExecutor(4);
   }
- 
+  @Override public void robotPeriodic() {
+    sm_.log();
+  }
+  
+
   @Override public void teleopInit() { start(); }
   @Override public void autonomousInit() { start(); }
   @Override public void teleopPeriodic() { periodic(); }
@@ -54,20 +56,42 @@ public class Robot extends TimedRobot {
 
   private void start(){
     sm_.start();
+    sm_.update();
+
+    //hatch.reset();
   }
 
   private void periodic(){
+    sm_.update();
+    
     // Drive
     drive.setTank(-leftDrive.getY(), -rightDrive.getY());
     leftDrive.whenTriggerPressed(() -> drive.setGear(true));
     rightDrive.whenTriggerPressed(() -> drive.setGear(true));
 
     // Operator
-    cargo.setIntake(operator.getY(Hand.kLeft));
-    operator.whenPressed(6, () -> hatch.setGear(true));
-    operator.whenPressed(5, () -> hatch.setGear(false));
-    operator.whenPressed(4, () -> cargo.setAngle(130));
-    operator.whenPressed(2, () -> cargo.setAngle(85));
-    operator.whenPressed(1, () -> cargo.setAngle(90));
+    //cargo.setIntake(operator.getY(Hand.kLeft));
+    operator.whenPressed(5, () -> {
+      hatch.togglePop();
+    });
+    if(operator.getRawButton(6)){
+      //System.out.println("PRESSED");
+      operator.whenPressed(4, () -> cargo.setAngle(150));
+      operator.whenPressed(3, () -> cargo.setAngle(130));
+      operator.whenPressed(2, () -> cargo.setAngle(90));
+      operator.whenPressed(1, () -> cargo.setAngle(85));
+    } else {
+      operator.whenPressed(4, () -> hatch.setAngle(220));
+      operator.whenPressed(3, () -> hatch.setAngle(175));
+      operator.whenPressed(2, () -> hatch.setAngle(165));
+      operator.whenPressed(1, () -> hatch.setAngle(100));
+    }
+    if(operator.getTriggerAxis(Hand.kLeft) > .75){
+      cargo.setIntake(-1);
+    } else if(operator.getTriggerAxis(Hand.kRight) > .75){
+      cargo.setIntake(.75);
+    } else {
+      cargo.setIntake(0);
+    }
   }
 }

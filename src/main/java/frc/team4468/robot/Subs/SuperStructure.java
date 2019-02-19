@@ -43,10 +43,8 @@ public class SuperStructure implements Subsystem {
     // PRIVATE HELPER FUNCTS
     private boolean hatchSafe() { return (Robot.hatch.angle() <= Constants.SuperStructure.hatchSafe); }
     private boolean cargoSafe() { return (Robot.cargo.angle() <= Constants.SuperStructure.cargoSafe); }
-
-    // SUBSYSTEM IMPL
-    @Override public void update(){
-        switch(manipulators_){
+    private void manipulatorState(Manipulators manip){
+        switch(manip){
             case START:
                 if(Robot.cargo.zeroed() && Robot.hatch.zeroed()){ // Arms are safe when ZEROED
                     manipulators_ = Manipulators.DEFAULT;
@@ -98,6 +96,20 @@ public class SuperStructure implements Subsystem {
                 //Robot.cargo.stop();
                 //Robot.hatch.stop();
             break;
+        }
+    }
+
+    // SUBSYSTEM IMPL
+    @Override public void update(){
+        manipulatorState(manipulators_);
+        if(RobotController.isBrownedOut()){
+            Robot.drive.setModifier(Constants.SuperStructure.driveModifier);
+            comp_.stop();
+        } else if(pdp_.getTotalPower() > Constants.SuperStructure.warningPower){
+            comp_.stop();  
+        } else {
+            Robot.drive.setModifier(1);
+            comp_.start();
         }
     }
 

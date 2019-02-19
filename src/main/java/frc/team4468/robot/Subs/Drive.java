@@ -2,6 +2,8 @@ package frc.team4468.robot.Subs;
 
 import frc.team4468.robot.Constants;
 import frc.team4468.robot.Lib.Subsystem;
+
+import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 
@@ -22,6 +24,7 @@ public class Drive implements Subsystem {
     private DoubleSolenoid shifter_ = new DoubleSolenoid(Constants.Drive.shift1, 
                                                          Constants.Drive.shift2);
 
+    /*
     private DifferentialDrive drive_ = new DifferentialDrive(
         new SpeedControllerGroup(
             leftMaster_,
@@ -32,18 +35,20 @@ public class Drive implements Subsystem {
             rightSlave1_,
             rightSlave2_)
     );
+    */
+    private DifferentialDrive drive_ = new DifferentialDrive(leftMaster_, rightMaster_);
 
     // STATE VARIABLES
+    private Value shift_ = Value.kOff;
     private boolean isTank = false;
-    private double turn_ = 0;
-    private double speed_ = 0;
+    private double modifier_ = 1;
     private double lpower_ = 0;
     private double rpower_ = 0;
-    private Value shift_ = Value.kOff;
+    private double speed_ = 0;
+    private double turn_ = 0;
 
     // CONSTRUCTOR
     public Drive(){
-        /*
         leftMaster_.configFactoryDefault();
         leftSlave1_.configFactoryDefault();
         leftSlave2_.configFactoryDefault();
@@ -56,19 +61,8 @@ public class Drive implements Subsystem {
         rightSlave1_.follow(rightMaster_);
         rightSlave2_.follow(rightMaster_);
 
-        leftMaster_.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, 1);
         leftMaster_.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative);
-
-        rightMaster_.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, 1);
         rightMaster_.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative);
-
-        leftMaster_.setInverted(true);
-        rightMaster_.setInverted(false);
-        leftSlave1_.setInverted(InvertType.FollowMaster);
-        leftSlave2_.setInverted(InvertType.FollowMaster);
-        rightSlave1_.setInverted(InvertType.FollowMaster);
-        rightSlave2_.setInverted(InvertType.FollowMaster);
-        */
 
         leftMaster_.enableCurrentLimit(true);
         leftMaster_.configPeakCurrentLimit(40);
@@ -98,6 +92,15 @@ public class Drive implements Subsystem {
         isTank = true;
     }
 
+    public double getRightVel(){
+        return rightMaster_.getSelectedSensorVelocity(0) * 
+               ((360 * Constants.Drive.wheelDiameter)/4096);
+    }
+
+    public int getLeftVel() {
+        return leftMaster_.getSelectedSensorVelocity(0);
+    }
+
     public void toggle(){
         shift_ = (shift_ == Value.kForward) ? Value.kReverse : Value.kForward;
     }
@@ -106,25 +109,32 @@ public class Drive implements Subsystem {
         shift_ = (high) ? Value.kForward : Value.kReverse;
     }
 
+    public void setModifier(double mod){
+        modifier_ = mod;
+    }
+
     // SUBSYSTEM IMPL
     @Override public void start(){
-        //shift_ = Value.kReverse;
-        //shifter_.set(shift_);
+        shift_ = Value.kForward;
+        shifter_.set(shift_);
     }
 
     @Override public void update(){
         if(isTank){
-            drive_.tankDrive(lpower_, rpower_);
+            drive_.tankDrive(modifier_ * lpower_, 
+                             modifier_ * rpower_);
         } else {
-            drive_.arcadeDrive(speed_, turn_);
+            drive_.arcadeDrive(modifier_ * speed_,
+                               modifier_ * turn_);
         }
         if(shifter_.get() != shift_) { shifter_.set(shift_); }
     }
 
     @Override public void stop(){
         drive_.stopMotor();
-        //shifter_.set(Value.kReverse);
+        shifter_.set(Value.kForward);
     }
+
     @Override public void log(){
     }
 }
