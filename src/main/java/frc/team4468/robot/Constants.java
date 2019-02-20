@@ -31,7 +31,7 @@ public class Constants {
         public static final double velD = 0;
         public static final double velF = 0;
         // Misc
-        public static final double rampRate = 0.1;
+        public static final double rampRate = 0.01;
         public static final int shift1 = 1;
         public static final int shift2 = 2;
         public static final double wheelDiameter = 6;
@@ -44,8 +44,8 @@ public class Constants {
         public static final int zeroer = 2;
         public static final double zeroSpeed = -0.1;
         public static final double armRatio = 1;
-        public static final double offset = -45;
-        public static final double zeroAngle = 242;
+        //public static final double offset = -30;
+        public static final double zeroAngle = 247;
 
         // PDFVA
         public static final double kP = 0.008;
@@ -68,11 +68,11 @@ public class Constants {
         public static final double armRatio = 0.285714;//(24/84);
         public static final double zeroAngle = 82;
         // PDFVA
-        public static final double kP = .018;
-        public static final double kD = .0001;
+        public static final double kP = .015;
+        public static final double kD = .000;
         public static final double kmP = 0;
         public static final double kmD = 0;
-        public static final double kF = .25;
+        public static final double kF = .3;
         public static final double kV = 0;
         public static final double kA = 0;
         // Motion Profile

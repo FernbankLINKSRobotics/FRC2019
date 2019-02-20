@@ -21,8 +21,8 @@ public class JoystickRunner extends HIDRunner {
         if(getTriggerPressed()){ f.run(); }
     }
 
-    public void whenReleased(Runnable f){
-        if(getTriggerPressed()){ f.run(); }
+    public void whenTriggerReleased(Runnable f){
+        if(getTriggerReleased()){ f.run(); }
     }
 
     @Override public double getX(Hand hand) {

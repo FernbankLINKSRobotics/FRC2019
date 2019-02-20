@@ -72,12 +72,18 @@ public class Drive implements Subsystem {
         rightMaster_.configPeakCurrentLimit(40);
         rightMaster_.configContinuousCurrentLimit(40);
 
-        leftMaster_.configOpenloopRamp(Constants.Drive.rampRate, Constants.System.CANTimeout);
-        leftSlave1_.configOpenloopRamp(Constants.Drive.rampRate, Constants.System.CANTimeout);
-        leftSlave2_.configOpenloopRamp(Constants.Drive.rampRate, Constants.System.CANTimeout);
-        rightMaster_.configOpenloopRamp(Constants.Drive.rampRate, Constants.System.CANTimeout);
-        rightSlave1_.configOpenloopRamp(Constants.Drive.rampRate, Constants.System.CANTimeout);
-        rightSlave2_.configOpenloopRamp(Constants.Drive.rampRate, Constants.System.CANTimeout);
+        leftMaster_.configOpenloopRamp(Constants.Drive.rampRate, 
+                                       Constants.System.CANTimeout);
+        leftSlave1_.configOpenloopRamp(Constants.Drive.rampRate,
+                                       Constants.System.CANTimeout);
+        leftSlave2_.configOpenloopRamp(Constants.Drive.rampRate,
+                                       Constants.System.CANTimeout);
+        rightMaster_.configOpenloopRamp(Constants.Drive.rampRate,
+                                        Constants.System.CANTimeout);
+        rightSlave1_.configOpenloopRamp(Constants.Drive.rampRate,
+                                        Constants.System.CANTimeout);
+        rightSlave2_.configOpenloopRamp(Constants.Drive.rampRate,
+                                        Constants.System.CANTimeout);
     }
 
     // PUBLIC INPUT OUTPUT

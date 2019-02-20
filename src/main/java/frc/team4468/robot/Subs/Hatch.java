@@ -95,8 +95,7 @@ public class Hatch implements Subsystem {
         double err = set - angle;
         double o = (Constants.Hatch.kmP * err) +                                   // Power proportinal to error
                    (Constants.Hatch.kmD * ((err - pErr_) / Constants.System.dt)) + // Power related to the derivative
-                   (Constants.Hatch.kF * Math.cos((angle * (Math.PI/ 180)) 
-                                                   + Constants.Hatch.offset)) +    // Power to counteract gravity
+                   (Constants.Hatch.kF * Math.cos(angle * (Math.PI/ 180))) +    // Power to counteract gravity
                    (Constants.Hatch.kV * vel) +
                    (Constants.Hatch.kA * acc);
         pErr_ = err;
@@ -143,7 +142,7 @@ public class Hatch implements Subsystem {
                 break;
             case PID:
                 double out = armPDF(angle_, angle());
-                System.out.println(out);
+                System.out.println("Power: " + out);
                 rotator_.set(ControlMode.PercentOutput,
                              out);
                 break;
@@ -177,6 +176,6 @@ public class Hatch implements Subsystem {
 
     @Override public void log(){
         //System.out.println("Zero: " + !limit_.get());
-        //System.out.println("Angle: " + angle());
+        System.out.println("Angle: " + angle());
     }
 }

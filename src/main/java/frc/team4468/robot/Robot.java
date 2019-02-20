@@ -1,5 +1,8 @@
 package frc.team4468.robot;
 
+import edu.wpi.cscore.UsbCamera;
+import edu.wpi.cscore.VideoMode.PixelFormat;
+import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 import frc.team4468.robot.Lib.Input.JoystickRunner;
@@ -7,6 +10,7 @@ import frc.team4468.robot.Lib.SubsystemManager;
 import frc.team4468.robot.Lib.Input.XboxRunner;
 import frc.team4468.robot.Lib.Actions.MacroExecutor;
 import frc.team4468.robot.Subs.*;
+import frc.team4468.robot.Auto.Actions.*;
 
 public class Robot extends TimedRobot {
   // SUBSYSTEMS
@@ -39,6 +43,9 @@ public class Robot extends TimedRobot {
     );
 
     executor_ = new MacroExecutor(4);
+
+    UsbCamera cam = CameraServer.getInstance().startAutomaticCapture("Camera", "/dev/video0");
+    cam.setVideoMode(PixelFormat.kMJPEG, 265, 144, 30);
   }
   @Override public void robotPeriodic() {
     sm_.log();
@@ -57,8 +64,6 @@ public class Robot extends TimedRobot {
   private void start(){
     sm_.start();
     sm_.update();
-
-    //hatch.reset();
   }
 
   private void periodic(){
@@ -70,12 +75,8 @@ public class Robot extends TimedRobot {
     rightDrive.whenTriggerPressed(() -> drive.setGear(true));
 
     // Operator
-    //cargo.setIntake(operator.getY(Hand.kLeft));
-    operator.whenPressed(5, () -> {
-      hatch.togglePop();
-    });
+    operator.whenPressed(5, () -> executor_.execute("Pop", new Pop()));
     if(operator.getRawButton(6)){
-      //System.out.println("PRESSED");
       operator.whenPressed(4, () -> cargo.setAngle(150));
       operator.whenPressed(3, () -> cargo.setAngle(130));
       operator.whenPressed(2, () -> cargo.setAngle(90));
@@ -87,11 +88,11 @@ public class Robot extends TimedRobot {
       operator.whenPressed(1, () -> hatch.setAngle(100));
     }
     if(operator.getTriggerAxis(Hand.kLeft) > .75){
-      cargo.setIntake(-1);
+      cargo.setIntake(-.9);
     } else if(operator.getTriggerAxis(Hand.kRight) > .75){
       cargo.setIntake(.75);
     } else {
-      cargo.setIntake(0);
+      cargo.setIntake(.15);
     }
   }
 }

@@ -122,7 +122,10 @@ public class Cargo implements Subsystem {
                 rotator_.stopMotor();
                 break;
             case PID:
-                rotator_.set(ControlMode.PercentOutput, armPDF(angle_, angle()));
+                double out = armPDF(angle_, angle());
+                //System.out.println("Speed: " + out);
+                //System.out.println("Angle: " + angle());
+                rotator_.set(ControlMode.PercentOutput, out);
                 break;
             case MP:
                 if(motion_ == null){
@@ -153,6 +156,7 @@ public class Cargo implements Subsystem {
     }
 
     @Override public void log(){
+        //System.out.println("Speed: " + rotator_.get());
         /*
         SmartDashboard.putBoolean("IS ZEROING", state_ == Position.ZEROING);
         SmartDashboard.putNumber("ANGLE", angle_);
