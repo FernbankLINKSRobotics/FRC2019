@@ -2,7 +2,6 @@ package frc.team4468.robot.Subs;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
-import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -19,7 +18,8 @@ public class Hatch implements Subsystem {
     // HARDWARE
     private WPI_TalonSRX rotator_ = new WPI_TalonSRX(Constants.Hatch.rotator);
     private DoubleSolenoid popper_ = new DoubleSolenoid(Constants.Hatch.pop1, Constants.Hatch.pop2);
-    private DigitalInput limit_ = new DigitalInput(Constants.Hatch.zeroer);
+    private DigitalInput zero_ = new DigitalInput(Constants.Hatch.zeroer);
+    private DigitalInput grab_ = new DigitalInput(Constants.Hatch.grab);
     
     // STATE VARIABLES
     public enum State {
@@ -41,7 +41,7 @@ public class Hatch implements Subsystem {
     // CONSTRUCTOR
     public Hatch(){
         rotator_.configFactoryDefault();
-        rotator_.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative);
+        rotator_.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Absolute);
         rotator_.enableVoltageCompensation(true);
         rotator_.setInverted(true);
     }
@@ -130,12 +130,17 @@ public class Hatch implements Subsystem {
         
         switch(state_){
             case ZERO:
+                /*    
                 rotator_.set(ControlMode.PercentOutput, Constants.Hatch.zeroSpeed);
-                if(!limit_.get()) {
+                if(!zero_.get()) {
                     state_ = State.PID;
                     rotator_.setSelectedSensorPosition(angleToTicks(Constants.Hatch.zeroAngle), 0, 10);
                     zeroed_ = true;
                 }
+                */
+                //state_ = State.PID;
+                rotator_.setSelectedSensorPosition(angleToTicks(Constants.Hatch.zeroAngle), 0, 10);
+                zeroed_ = true;
                 break;
             case DISABLED:
                 rotator_.stopMotor();
@@ -175,7 +180,8 @@ public class Hatch implements Subsystem {
     }
 
     @Override public void log(){
-        //System.out.println("Zero: " + !limit_.get());
-        System.out.println("Angle: " + angle());
+        SmartDashboard.putBoolean("Hatch Zero", zeroed_);
+        SmartDashboard.putNumber("Hatch Angle", angle());
+        SmartDashboard.putNumber("Hatch Power", rotator_.get());
     }
 }

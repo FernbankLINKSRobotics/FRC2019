@@ -4,12 +4,13 @@ import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 
-import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Timer;
 import frc.team4468.robot.Constants;
 import frc.team4468.robot.Lib.Subsystem;
+import edu.wpi.first.wpilibj.DigitalInput;
 import frc.team4468.robot.Lib.Control.MotionProfile;
 import frc.team4468.robot.Lib.Control.TrapezoidalProfile;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Cargo implements Subsystem {
     // HARDWARE
@@ -37,7 +38,7 @@ public class Cargo implements Subsystem {
     // CONSTUCTOR
     public Cargo() {
         rotator_.configFactoryDefault();
-        rotator_.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative);
+        rotator_.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Absolute);
         rotator_.enableVoltageCompensation(true);
     }
 
@@ -156,11 +157,8 @@ public class Cargo implements Subsystem {
     }
 
     @Override public void log(){
-        //System.out.println("Speed: " + rotator_.get());
-        /*
-        SmartDashboard.putBoolean("IS ZEROING", state_ == Position.ZEROING);
-        SmartDashboard.putNumber("ANGLE", angle_);
-        SmartDashboard.putNumber("Motor Speed", rotator.get());
-        */
+        SmartDashboard.putBoolean("Cargo Zero", zeroed_);
+        SmartDashboard.putNumber("Cargo Angle", angle());
+        SmartDashboard.putNumber("Cargo Speed", rotator_.get());
     }
 }

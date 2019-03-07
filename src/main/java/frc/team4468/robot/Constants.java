@@ -8,9 +8,10 @@ public class Constants {
     }
 
     public class Input {
-        public static final int driveLeft = 0;
-        public static final int driveRight = 1;
-        public static final int operator = 2;
+        public static final int drive = 0;
+        //public static final int driveLeft = 0;
+        //public static final int driveRight = 1;
+        public static final int operator = 1;//2;
     }
 
     public class Drive {
@@ -31,7 +32,7 @@ public class Constants {
         public static final double velD = 0;
         public static final double velF = 0;
         // Misc
-        public static final double rampRate = 0.01;
+        public static final double rampRate = 0.3;
         public static final int shift1 = 1;
         public static final int shift2 = 2;
         public static final double wheelDiameter = 6;
@@ -42,10 +43,11 @@ public class Constants {
         public static final int pop1 = 0; // solenoid ports
         public static final int pop2 = 3;
         public static final int zeroer = 2;
+        public static final int grab = 0;
         public static final double zeroSpeed = -0.1;
         public static final double armRatio = 1;
         //public static final double offset = -30;
-        public static final double zeroAngle = 247;
+        public static final double zeroAngle = 90 + 145;//247;
 
         // PDFVA
         public static final double kP = 0.008;

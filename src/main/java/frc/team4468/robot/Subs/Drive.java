@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Drive implements Subsystem {
     // HARDWARE
@@ -24,7 +25,6 @@ public class Drive implements Subsystem {
     private DoubleSolenoid shifter_ = new DoubleSolenoid(Constants.Drive.shift1, 
                                                          Constants.Drive.shift2);
 
-    /*
     private DifferentialDrive drive_ = new DifferentialDrive(
         new SpeedControllerGroup(
             leftMaster_,
@@ -35,8 +35,7 @@ public class Drive implements Subsystem {
             rightSlave1_,
             rightSlave2_)
     );
-    */
-    private DifferentialDrive drive_ = new DifferentialDrive(leftMaster_, rightMaster_);
+    //private DifferentialDrive drive_ = new DifferentialDrive(leftMaster_, rightMaster_);
 
     // STATE VARIABLES
     private Value shift_ = Value.kOff;
@@ -56,14 +55,17 @@ public class Drive implements Subsystem {
         rightSlave1_.configFactoryDefault();
         rightSlave2_.configFactoryDefault();
 
+        /*
         leftSlave1_.follow(leftMaster_);
         leftSlave2_.follow(leftMaster_);
         rightSlave1_.follow(rightMaster_);
         rightSlave2_.follow(rightMaster_);
+        */
 
         leftMaster_.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative);
         rightMaster_.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative);
 
+        /*
         leftMaster_.enableCurrentLimit(true);
         leftMaster_.configPeakCurrentLimit(40);
         leftMaster_.configContinuousCurrentLimit(40);
@@ -71,6 +73,7 @@ public class Drive implements Subsystem {
         rightMaster_.enableCurrentLimit(true);
         rightMaster_.configPeakCurrentLimit(40);
         rightMaster_.configContinuousCurrentLimit(40);
+        */
 
         leftMaster_.configOpenloopRamp(Constants.Drive.rampRate, 
                                        Constants.System.CANTimeout);
@@ -103,8 +106,9 @@ public class Drive implements Subsystem {
                ((360 * Constants.Drive.wheelDiameter)/4096);
     }
 
-    public int getLeftVel() {
-        return leftMaster_.getSelectedSensorVelocity(0);
+    public double getLeftVel() {
+        return leftMaster_.getSelectedSensorVelocity(0) *
+               ((360 * Constants.Drive.wheelDiameter)/4096);
     }
 
     public void toggle(){
@@ -142,5 +146,9 @@ public class Drive implements Subsystem {
     }
 
     @Override public void log(){
+        SmartDashboard.putNumber("Drive Left Vel", getLeftVel());
+        SmartDashboard.putNumber("Drive Right Vel", getRightVel());
+        SmartDashboard.putNumber("Drive Left Speed", leftMaster_.get());
+        SmartDashboard.putNumber("Drive Right Speed", rightMaster_.get());
     }
 }
