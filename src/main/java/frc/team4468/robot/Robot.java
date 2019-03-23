@@ -1,10 +1,10 @@
-package frc.team4468.robot;
+                                                                    package frc.team4468.robot;
 
 import org.opencv.core.Mat;
 
-import edu.wpi.cscore.CvSink;
-import edu.wpi.cscore.CvSource;
+import edu.wpi.cscore.VideoSink;
 import edu.wpi.cscore.UsbCamera;
+import edu.wpi.cscore.VideoSource;
 import edu.wpi.cscore.VideoMode.PixelFormat;
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
@@ -37,6 +37,11 @@ public class Robot extends TimedRobot {
   // PDP
   private PowerDistributionPanel pdp_ = new PowerDistributionPanel();
 
+  // Cameras
+  UsbCamera cam1;
+  UsbCamera cam2;
+  VideoSink server;
+
   // ROBOT
   @Override public void robotInit() {
     struc = new SuperStructure();
@@ -52,44 +57,15 @@ public class Robot extends TimedRobot {
     );
 
     executor_ = new MacroExecutor(4);
-    /*
-    Thread t = new Thread(() -> {
-      boolean allowCam1 = false;
-      UsbCamera cam = CameraServer.getInstance().startAutomaticCapture(0);
-      //cam.setVideoMode(PixelFormat.kMJPEG, 265, 144, 30);
-
-      UsbCamera cam2 = CameraServer.getInstance().startAutomaticCapture(1);
-      //cam2.setVideoMode(PixelFormat.kMJPEG, 265, 144, 30);
-
-      CvSink  cvSink1 = CameraServer.getInstance().getVideo(cam);
-      CvSink  cvSink2 = CameraServer.getInstance().getVideo(cam2);
-      CvSource outputStream = CameraServer.getInstance().putVideo("Switcher", 256, 144);
-
-      Mat image = new Mat();
-
-      while(!Thread.interrupted()) {
-        if(operator.getRawButton(6)) {
-          allowCam1 = !allowCam1;
-        }
-        if(allowCam1) {
-          cvSink2.setEnabled(false);
-          cvSink1.setEnabled(true);
-          cvSink1.grabFrame(image);
-        } else {
-          cvSink1.setEnabled(false);
-          cvSink2.setEnabled(true);
-          cvSink2.grabFrame(image);
-        }
-        outputStream.putFrame(image);
-      }
-    });
-    */
-    //t.start();
-    //UsbCamera cam = CameraServer.getInstance().startAutomaticCapture("Camera", "/dev/video0");
-    //cam.setVideoMode(PixelFormat.kMJPEG, 265, 144, 30);
-    UsbCamera cam2 = CameraServer.getInstance().startAutomaticCapture("Camera", "/dev/video1");
+    
+    UsbCamera cam1 = CameraServer.getInstance().startAutomaticCapture("Cargo", "/dev/video0");
+    cam1.setConnectionStrategy(VideoSource.ConnectionStrategy.kKeepOpen);
+    cam1.setVideoMode(PixelFormat.kMJPEG, 265, 144, 30);
+    //cam1.SetConnectionStrategy(VideoSource.ConnectionStrategy.kConnectionKeepOpen);
+    UsbCamera cam2 = CameraServer.getInstance().startAutomaticCapture("Hatch", "/dev/video1");
+    cam2.setConnectionStrategy(VideoSource.ConnectionStrategy.kKeepOpen);
     cam2.setVideoMode(PixelFormat.kMJPEG, 265, 144, 30);
-
+    //server = CameraServer.getInstance().getServer();
   }
   @Override public void robotPeriodic() {
     sm_.log();
@@ -136,7 +112,8 @@ public class Robot extends TimedRobot {
     drive.setArcade(-limit(driver.getX(Hand.kLeft)), -limit(driver.getY(Hand.kRight)));
     driver.whenTriggerThreshold(Hand.kLeft, .9, () -> drive.setGear(true));
     driver.whenTriggerThreshold(Hand.kRight, .9, () -> drive.setGear(false));
-
+    driver.whenPressed(1, () -> cargo.setAngle(160));
+    driver.whenPressed(2, () -> hatch.setAngle(220));
     // Operator
     operator.whenPressed(5, () -> executor_.execute("Pop", new Pop()));
     if(operator.getRawButton(6)){
@@ -144,11 +121,13 @@ public class Robot extends TimedRobot {
       operator.whenPressed(3, () -> cargo.setAngle(120));
       operator.whenPressed(2, () -> cargo.setAngle(90));
       operator.whenPressed(1, () -> cargo.setAngle(70));
+      //server.setSource(cam1);
     } else {
       operator.whenPressed(4, () -> hatch.setAngle(220));
       operator.whenPressed(3, () -> hatch.setAngle(175));
       operator.whenPressed(2, () -> hatch.setAngle(165));
       operator.whenPressed(1, () -> hatch.setAngle(85));
+      //server.setSource(cam2);
     }
     if(operator.getTriggerAxis(Hand.kLeft) > .75){
       cargo.setIntake(-.9);
@@ -158,6 +137,7 @@ public class Robot extends TimedRobot {
       cargo.setIntake(.15);
     }
 
+    operator.whenPressed(8, () -> hatch.zero());
 
     System.out.println("Left Master " + pdp_.getCurrent(0));
     System.out.println("Right Master " + pdp_.getCurrent(1));

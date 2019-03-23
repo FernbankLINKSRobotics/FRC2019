@@ -48,7 +48,7 @@ public class Constants {
         public static final double armRatio = 1;
         //public static final double offset = -30;
         public static final double zeroAngle = 90 + 145;//247;
-
+        public static final double emergancyZero = 90 + 145 + 5;
         // PDFVA
         public static final double kP = 0.008;
         public static final double kD = 0.0003;

@@ -33,6 +33,7 @@ public class Hatch implements Subsystem {
     private Value pop_ = Value.kReverse;
     private boolean zeroed_ = false;
     private double angle_ = 180;
+    private double pow_ = 0;
 
     private double pErr_ = 0; // Previous error
     private MotionProfile motion_ = null;
@@ -59,6 +60,10 @@ public class Hatch implements Subsystem {
 
     public void togglePop(){
         pop_ = (popper_.get() == Value.kForward) ? Value.kReverse : Value.kForward;
+    }
+
+    public void zero(){
+        rotator_.setSelectedSensorPosition(angleToTicks(90), 0, 10);
     }
 
     public void setGear(boolean b){
@@ -121,8 +126,10 @@ public class Hatch implements Subsystem {
 
     @Override public void update(){
         if(!zeroed_) { state_ = State.ZERO; }
-        popper_.set(pop_);
-
+        if(popper_.get() != pop_){
+            popper_.set(pop_);
+            System.out.println("SWITCH");
+        }
         //System.out.println("Error: " + (angle_ - angle()));
         //System.out.println("Ticks: " + rotator_.getSelectedSensorPosition(0));
         //System.out.println("Target: " + angle_)
