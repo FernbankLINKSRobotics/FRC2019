@@ -46,13 +46,19 @@ public class SuperStructure implements Subsystem {
     private void manipulatorState(Manipulators manip){
         switch(manip){
             case START:
-                if(Robot.cargo.zeroed() && Robot.hatch.zeroed()){ // Arms are safe when ZEROED
+                if(Robot.cargo.zeroed()){ // Arms are safe when ZEROED
                     manipulators_ = Manipulators.DEFAULT;
                     break;
                 }
-                if(!cargoStarted){ Robot.cargo.start(); }
+                if(!cargoStarted){ 
+                    Robot.cargo.start();
+                    cargoStarted = true;
+                }
                 if(cargoSafe()){
-                    if(!hatchStarted){ Robot.hatch.start(); }
+                    if(!hatchStarted){ 
+                        Robot.hatch.start();
+                        hatchStarted = true;
+                    }
                 }  
             break;
 
@@ -114,7 +120,7 @@ public class SuperStructure implements Subsystem {
     }
 
     @Override public void start(){
-        manipulators_ = Manipulators.DISABLED;
+        manipulators_ = Manipulators.START;
         comp_.clearAllPCMStickyFaults();
         pdp_.clearStickyFaults();
     }

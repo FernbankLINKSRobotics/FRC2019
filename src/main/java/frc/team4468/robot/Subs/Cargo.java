@@ -33,6 +33,7 @@ public class Cargo implements Subsystem {
     private double angle_ = 90;
     private double speed_ = 0;
     private double pErr_ = 0;
+    private double tErr_ = 0;
     private double t_ = 0;
 
     // CONSTUCTOR
@@ -63,27 +64,31 @@ public class Cargo implements Subsystem {
     public boolean zeroed(){ return zeroed_; }
 
     // PRIVATE HELPER FUNCTS
-    private double armPDF(double set, double angle){
+    private double armPDF(double set, double angle) {
         double err = set - angle;
-        double o = (Constants.Cargo.kP * err) +                                   // Power proportinal to error
+        tErr_ += err;
+        double o = (Constants.Cargo.kP * err) + // Power proportinal to error
+                   (Constants.Cargo.kI * tErr_ * Constants.System.dt) + // Power related to the integral
                    (Constants.Cargo.kD * ((err - pErr_) / Constants.System.dt)) + // Power related to the derivative
-                   (Constants.Cargo.kF * Math.sin(angle * (Math.PI/ 180)));       // Power to counteract gravity
+                   (Constants.Cargo.kF * Math.cos(angle * (Math.PI / 180))); // Power to counteract gravity
         pErr_ = err;
-        o = (o >  1) ? 1 :     // clamps the range to -1 to 1
-            (o < -1) ? -1 : o;
+        o = (o > 1) ? 1 : // clamps the range to -1 to 1
+                (o < -1) ? -1 : o;
         return -o;
     }
 
-    private double armMPFollower(double set, double angle, double vel, double acc){
+    private double armMPFollower(double set, double angle, double vel, double acc) {
         double err = set - angle;
-        double o = (Constants.Cargo.kmP * err) +                                   // Power proportinal to error
+        tErr_ += err;
+        double o = (Constants.Cargo.kmP * err) + // Power proportinal to error
+                   (Constants.Cargo.kmI * tErr_ * Constants.System.dt) + // Power related to the integral
                    (Constants.Cargo.kmD * ((err - pErr_) / Constants.System.dt)) + // Power related to the derivative
-                   (Constants.Cargo.kF * Math.sin(angle * (Math.PI/ 180))) +       // Power to counteract gravity
-                   (Constants.Cargo.kV * vel) +                                    // Feed forward for velocity
-                   (Constants.Cargo.kA * acc);                                     // Feed forward for acceleration
+                   (Constants.Cargo.kF * Math.cos(angle * (Math.PI / 180))) + // Power to counteract gravity
+                   (Constants.Cargo.kV * vel) + 
+                   (Constants.Cargo.kA * acc);
         pErr_ = err;
-        o = (o >  1) ? 1 :     // clamps the range to -1 to 1
-            (o < -1) ? -1 : o;
+        o = (o > 1) ? 1 : // clamps the range to -1 to 1
+                (o < -1) ? -1 : o;
         return -o;
     }
 
@@ -99,16 +104,11 @@ public class Cargo implements Subsystem {
     // SUBSYSTEM IMPL
     @Override public void start(){
         state_ = State.ZERO;
-        angle_ = 150;
+        angle_ = 90;
     }
 
     @Override public void update(){
         if(!zeroed_) { state_ = State.ZERO; }
-        //System.out.println("Zero: " + !limit_.get());
-        //System.out.println("Angle: " + angle());
-        //System.out.println("Error: " + (angle_ - angle()));
-        //System.out.println("Ticks: " + rotator_.getSelectedSensorPosition(0));
-        //System.out.println("Target: " + angle_);
         
         switch(state_){
             case ZERO:

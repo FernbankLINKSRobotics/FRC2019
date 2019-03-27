@@ -40,19 +40,26 @@ public class Constants {
 
     public class Hatch {
         public static final int rotator = 4; // Motor for rotating
-        public static final int pop1 = 0; // solenoid ports
-        public static final int pop2 = 3;
+        public static final int pop1 = 4;
+        public static final int pop2 = 5;
+        public static final int clamp1 = 0; // solenoid ports
+        public static final int clamp2 = 3;
         public static final int zeroer = 2;
         public static final int grab = 0;
+        public static final int potPort = 0;
+        public static final int potRange = 3600;
+        public static final int potOff = 0; // Placeholder
         public static final double zeroSpeed = -0.1;
         public static final double armRatio = 1;
         //public static final double offset = -30;
         public static final double zeroAngle = 90 + 145;//247;
-        public static final double emergancyZero = 90 + 145 + 5;
+
         // PDFVA
         public static final double kP = 0.008;
+        public static final double kI = 0.0;
         public static final double kD = 0.0003;
         public static final double kmP = 0;
+        public static final double kmI = 0;
         public static final double kmD = 0;
         public static final double kF = -0.12;
         public static final double kV = 0;
@@ -71,8 +78,10 @@ public class Constants {
         public static final double zeroAngle = 82;
         // PDFVA
         public static final double kP = .015;
+        public static final double kI = 0.0;
         public static final double kD = .000;
         public static final double kmP = 0;
+        public static final double kmI = 0;
         public static final double kmD = 0;
         public static final double kF = .3;
         public static final double kV = 0;
