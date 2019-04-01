@@ -82,9 +82,9 @@ public class Robot extends TimedRobot {
     });
     */
     //t.start();
-    //UsbCamera cam = CameraServer.getInstance().startAutomaticCapture("Camera", "/dev/video0");
-    //cam.setVideoMode(PixelFormat.kMJPEG, 265, 144, 30);
-    UsbCamera cam2 = CameraServer.getInstance().startAutomaticCapture("Camera", "/dev/video1");
+    UsbCamera cam = CameraServer.getInstance().startAutomaticCapture("Camera 1", "/dev/video1");
+    cam.setVideoMode(PixelFormat.kMJPEG, 265, 144, 30);
+    UsbCamera cam2 = CameraServer.getInstance().startAutomaticCapture("Camera 2", "/dev/video0");
     cam2.setVideoMode(PixelFormat.kMJPEG, 265, 144, 30);
 
   }
@@ -106,6 +106,7 @@ public class Robot extends TimedRobot {
 
   private void start(){
     //struc.start();
+    sm_.start();
     comp_.clearAllPCMStickyFaults();
   }
 
@@ -119,27 +120,31 @@ public class Robot extends TimedRobot {
     driver.whenTriggerThreshold(Hand.kRight, .9, () -> drive.setGear(false));
 
     // Operator
+    /*
     operator.whenPressed(5, () -> hatch.togglePop());
     operator.whenPressed(6, () -> hatch.toggleClamp());
     operator.whenPressed(4, () -> {
       hatch.togglePop();
       hatch.toggleClamp();
     });
-    /*
-    if(operator.getRawButton(6)){
-      operator.whenPressed(4, () -> struc.setCargo(150));
-      operator.whenPressed(3, () -> struc.setCargo(120));
-      operator.whenPressed(2, () -> struc.setCargo(90));
-      operator.whenPressed(1, () -> struc.setCargo(70));
-    } else {
-      operator.whenPressed(4, () -> struc.setHatch(220));
-      operator.whenPressed(3, () -> struc.setHatch(175));
-      operator.whenPressed(2, () -> struc.setHatch(165));
-      operator.whenPressed(1, () -> struc.setHatch(85));
-    }
     */
+    if(operator.getRawButton(6)){
+      operator.whenPressed(4, () -> cargo.setAngle(170));
+      operator.whenPressed(3, () -> cargo.setAngle(145));
+      operator.whenPressed(2, () -> cargo.setAngle(90));
+      operator.whenPressed(1, () -> cargo.setAngle(90));
+    } else {
+      operator.whenPressed(4, () -> hatch.setAngle(220));
+      operator.whenPressed(2, () -> hatch.togglePop());
+      operator.whenPressed(3, () -> hatch.toggleClamp());
+      //operator.whenPressed(3, () -> hatch.setAngle(175));
+      //operator.whenPressed(2, () -> hatch.setAngle(165));
+      operator.whenPressed(1, () -> hatch.setAngle(180));
+    }
+    operator.whenPressed(5, () -> cargo.lock());
+    
     if(operator.getTriggerAxis(Hand.kLeft) > .75){
-      cargo.setIntake(-.9);
+      cargo.setIntake(-.8);
     } else if(operator.getTriggerAxis(Hand.kRight) > .75){
       cargo.setIntake(.75);
     } else {

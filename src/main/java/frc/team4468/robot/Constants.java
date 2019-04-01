@@ -33,35 +33,35 @@ public class Constants {
         public static final double velF = 0;
         // Misc
         public static final double rampRate = 0.3;
-        public static final int shift1 = 1;
-        public static final int shift2 = 2;
+        public static final int shift1 = 4;
+        public static final int shift2 = 5;
         public static final double wheelDiameter = 6;
     }
 
     public class Hatch {
         public static final int rotator = 4; // Motor for rotating
-        public static final int pop1 = 4;
-        public static final int pop2 = 5;
+        public static final int pop1 = 2;
+        public static final int pop2 = 3;
         public static final int clamp1 = 0; // solenoid ports
-        public static final int clamp2 = 3;
+        public static final int clamp2 = 1;
         public static final int zeroer = 2;
         public static final int grab = 0;
-        public static final int potPort = 0;
-        public static final int potRange = 3600;
-        public static final int potOff = 0; // Placeholder
+        public static final int potPort = 1;
+        public static final int potRange = 36000;
+        public static final int potOff = -34120; // Placeholder
         public static final double zeroSpeed = -0.1;
         public static final double armRatio = 1;
         //public static final double offset = -30;
-        public static final double zeroAngle = 90 + 145;//247;
+        public static final double zeroAngle = 90 + 155;//247;
 
         // PDFVA
         public static final double kP = 0.008;
         public static final double kI = 0.0;
-        public static final double kD = 0.0003;
+        public static final double kD = 0.0;
         public static final double kmP = 0;
         public static final double kmI = 0;
         public static final double kmD = 0;
-        public static final double kF = -0.12;
+        public static final double kF = -0.;
         public static final double kV = 0;
         public static final double kA = 0;
         // Motion Profile
@@ -75,15 +75,15 @@ public class Constants {
         public static final int zeroer = 1;
         public static final double zeroSpeed = 0.25;
         public static final double armRatio = 0.285714;//(24/84);
-        public static final double zeroAngle = 82;
+        public static final double zeroAngle = 95;
         // PDFVA
-        public static final double kP = .015;
-        public static final double kI = 0.0;
+        public static final double kP = .009;
+        public static final double kI = 0.0001;
         public static final double kD = .000;
         public static final double kmP = 0;
         public static final double kmI = 0;
         public static final double kmD = 0;
-        public static final double kF = .3;
+        public static final double kF = .31;//.292;
         public static final double kV = 0;
         public static final double kA = 0;
         // Motion Profile
@@ -97,7 +97,7 @@ public class Constants {
     }
 
     public class SuperStructure {
-        public static final double cargoSafe = 120;
+        public static final double cargoSafe = 140;
         public static final double hatchSafe = 200;
         public static final double cargoDefault = 90;
         public static final double hatchDefault = 180;

@@ -22,6 +22,7 @@ public class Cargo implements Subsystem {
     // STATE VARIABLES
     public enum State {
         DISABLED,
+        LOCK,
         ZERO,
         PID,
         MP
@@ -44,6 +45,11 @@ public class Cargo implements Subsystem {
     }
 
     // PUBLIC INPUT OUTPUT
+
+    public void lock(){
+        state_ = State.LOCK;
+    }
+
     public void setAngle(double theta){
         state_ = State.PID;
         angle_ = theta;
@@ -70,7 +76,7 @@ public class Cargo implements Subsystem {
         double o = (Constants.Cargo.kP * err) + // Power proportinal to error
                    (Constants.Cargo.kI * tErr_ * Constants.System.dt) + // Power related to the integral
                    (Constants.Cargo.kD * ((err - pErr_) / Constants.System.dt)) + // Power related to the derivative
-                   (Constants.Cargo.kF * Math.cos(angle * (Math.PI / 180))); // Power to counteract gravity
+                   (Constants.Cargo.kF * Math.sin(angle * (Math.PI / 180))); // Power to counteract gravity
         pErr_ = err;
         o = (o > 1) ? 1 : // clamps the range to -1 to 1
                 (o < -1) ? -1 : o;
@@ -83,7 +89,7 @@ public class Cargo implements Subsystem {
         double o = (Constants.Cargo.kmP * err) + // Power proportinal to error
                    (Constants.Cargo.kmI * tErr_ * Constants.System.dt) + // Power related to the integral
                    (Constants.Cargo.kmD * ((err - pErr_) / Constants.System.dt)) + // Power related to the derivative
-                   (Constants.Cargo.kF * Math.cos(angle * (Math.PI / 180))) + // Power to counteract gravity
+                   (Constants.Cargo.kF * Math.sin(angle * (Math.PI / 180))) + // Power to counteract gravity
                    (Constants.Cargo.kV * vel) + 
                    (Constants.Cargo.kA * acc);
         pErr_ = err;
@@ -104,13 +110,23 @@ public class Cargo implements Subsystem {
     // SUBSYSTEM IMPL
     @Override public void start(){
         state_ = State.ZERO;
-        angle_ = 90;
+        angle_ = 170;
     }
 
     @Override public void update(){
         if(!zeroed_) { state_ = State.ZERO; }
         
         switch(state_){
+            case LOCK:
+                double lock = 0;
+                if(angle() < 160){
+                    lock = armPDF(180, angle());
+                } else {
+                    lock = -.2;
+                }
+                rotator_.set(ControlMode.PercentOutput, lock);
+                break;
+
             case ZERO:
                 rotator_.set(ControlMode.PercentOutput, Constants.Cargo.zeroSpeed);
                 if(!limit_.get()) {
@@ -124,7 +140,7 @@ public class Cargo implements Subsystem {
                 break;
             case PID:
                 double out = armPDF(angle_, angle());
-                //System.out.println("Speed: " + out);
+                System.out.println("Speed: " + out);
                 //System.out.println("Angle: " + angle());
                 rotator_.set(ControlMode.PercentOutput, out);
                 break;

@@ -1,6 +1,7 @@
 package frc.team4468.robot.Subs;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import edu.wpi.first.wpilibj.AnalogPotentiometer;
@@ -20,8 +21,7 @@ public class Hatch implements Subsystem {
     private DoubleSolenoid popper_ = new DoubleSolenoid(Constants.Hatch.pop1, Constants.Hatch.pop2);
     private AnalogPotentiometer pot = new AnalogPotentiometer(
 	        Constants.Hatch.potPort, 
-	        Constants.Hatch.potRange, 
-	        Constants.Hatch.potOff
+	        1
 	);
     //private DigitalInput zero_ = new DigitalInput(Constants.Hatch.zeroer);
     //private DigitalInput grab_ = new DigitalInput(Constants.Hatch.grab);
@@ -29,6 +29,7 @@ public class Hatch implements Subsystem {
     // STATE VARIABLES
     public enum State {
         DISABLED,
+        ZERO,
         PID,
         MP
     }
@@ -47,6 +48,7 @@ public class Hatch implements Subsystem {
     // CONSTRUCTOR
     public Hatch(){
         rotator_.configFactoryDefault();
+        rotator_.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Absolute);
         rotator_.enableVoltageCompensation(true);
         rotator_.setInverted(true);
     }
@@ -85,7 +87,7 @@ public class Hatch implements Subsystem {
     }
 
     public double angle(){
-        return pot.get();
+        return ticksToAngle(rotator_.getSelectedSensorPosition(0));
     }
 
     // PRIVATE HELPER FUNCTS
@@ -95,7 +97,7 @@ public class Hatch implements Subsystem {
         double o = (Constants.Hatch.kP * err) +                                   // Power proportinal to error
                    (Constants.Hatch.kI * tErr_ * Constants.System.dt) +           // Power related to the integral
                    (Constants.Hatch.kD * ((err - pErr_) / Constants.System.dt)) + // Power related to the derivative
-                   (Constants.Hatch.kF * Math.cos(angle * (Math.PI/ 180)));       // Power to counteract gravity
+                   (Constants.Hatch.kF * Math.sin(angle * (Math.PI/ 180)));       // Power to counteract gravity
         pErr_ = err;
         o = (o >  1) ? 1 :     // clamps the range to -1 to 1
             (o < -1) ? -1 : o;
@@ -108,7 +110,7 @@ public class Hatch implements Subsystem {
         double o = (Constants.Hatch.kmP * err) +                                   // Power proportinal to error
                    (Constants.Hatch.kmI * tErr_ * Constants.System.dt) +            // Power related to the integral
                    (Constants.Hatch.kmD * ((err - pErr_) / Constants.System.dt)) + // Power related to the derivative
-                   (Constants.Hatch.kF * Math.cos(angle * (Math.PI/ 180))) +       // Power to counteract gravity
+                   (Constants.Hatch.kF * Math.sin(angle * (Math.PI/ 180))) +       // Power to counteract gravity
                    (Constants.Hatch.kV * vel) +
                    (Constants.Hatch.kA * acc);
         pErr_ = err;
@@ -117,7 +119,7 @@ public class Hatch implements Subsystem {
         return -o;
     }
 
-    /*
+    
     private int angleToTicks(double angle){
         return (int)(angle * (4096/(360 * Constants.Hatch.armRatio)));
     }
@@ -125,14 +127,14 @@ public class Hatch implements Subsystem {
     private double ticksToAngle(int ticks){
         return ticks * ((360 * Constants.Hatch.armRatio)/4096);
     }
-    */
+    
 
     // SUBSYSTEM IMPL
     @Override public void start(){
-        state_ = State.DISABLED;
+        state_ = State.ZERO;
         pop_ = Value.kReverse;
         open_ = Value.kReverse;
-        angle_ = 180;
+        angle_ = 160;
     }
 
     @Override public void update(){
@@ -140,6 +142,11 @@ public class Hatch implements Subsystem {
         popper_.set(pop_);
 
         switch(state_){
+            case ZERO:
+                rotator_.setSelectedSensorPosition(angleToTicks(Constants.Hatch.zeroAngle), 0, 10);
+                state_ = State.DISABLED;
+                zeroed_ = true;
+                break;
             case DISABLED:
                 rotator_.stopMotor();
                 break;
