@@ -109,7 +109,7 @@ public class Cargo implements Subsystem {
     
     // SUBSYSTEM IMPL
     @Override public void start(){
-        state_ = State.ZERO;
+        state_ = State.LOCK;
         angle_ = 170;
     }
 

@@ -49,39 +49,6 @@ public class Robot extends TimedRobot {
     );
 
     executor_ = new MacroExecutor(4);
-    /*
-    Thread t = new Thread(() -> {
-      boolean allowCam1 = false;
-      UsbCamera cam = CameraServer.getInstance().startAutomaticCapture(0);
-      //cam.setVideoMode(PixelFormat.kMJPEG, 265, 144, 30);
-
-      UsbCamera cam2 = CameraServer.getInstance().startAutomaticCapture(1);
-      //cam2.setVideoMode(PixelFormat.kMJPEG, 265, 144, 30);
-
-      CvSink  cvSink1 = CameraServer.getInstance().getVideo(cam);
-      CvSink  cvSink2 = CameraServer.getInstance().getVideo(cam2);
-      CvSource outputStream = CameraServer.getInstance().putVideo("Switcher", 256, 144);
-
-      Mat image = new Mat();
-
-      while(!Thread.interrupted()) {
-        if(operator.getRawButton(6)) {
-          allowCam1 = !allowCam1;
-        }
-        if(allowCam1) {
-          cvSink2.setEnabled(false);
-          cvSink1.setEnabled(true);
-          cvSink1.grabFrame(image);
-        } else {
-          cvSink1.setEnabled(false);
-          cvSink2.setEnabled(true);
-          cvSink2.grabFrame(image);
-        }
-        outputStream.putFrame(image);
-      }
-    });
-    */
-    //t.start();
     UsbCamera cam = CameraServer.getInstance().startAutomaticCapture("Camera 1", "/dev/video1");
     cam.setVideoMode(PixelFormat.kMJPEG, 265, 144, 30);
     UsbCamera cam2 = CameraServer.getInstance().startAutomaticCapture("Camera 2", "/dev/video0");
@@ -120,25 +87,16 @@ public class Robot extends TimedRobot {
     driver.whenTriggerThreshold(Hand.kRight, .9, () -> drive.setGear(false));
 
     // Operator
-    /*
-    operator.whenPressed(5, () -> hatch.togglePop());
-    operator.whenPressed(6, () -> hatch.toggleClamp());
-    operator.whenPressed(4, () -> {
-      hatch.togglePop();
-      hatch.toggleClamp();
-    });
-    */
     if(operator.getRawButton(6)){
       operator.whenPressed(4, () -> cargo.setAngle(170));
       operator.whenPressed(3, () -> cargo.setAngle(145));
-      operator.whenPressed(2, () -> cargo.setAngle(90));
+      operator.whenPressed(2, () -> cargo.setAngle(100));
       operator.whenPressed(1, () -> cargo.setAngle(90));
     } else {
+      operator.whenPressed(8, () -> hatch.setAngle(230));
       operator.whenPressed(4, () -> hatch.setAngle(220));
-      operator.whenPressed(2, () -> hatch.togglePop());
-      operator.whenPressed(3, () -> hatch.toggleClamp());
-      //operator.whenPressed(3, () -> hatch.setAngle(175));
-      //operator.whenPressed(2, () -> hatch.setAngle(165));
+      operator.whenPressed(2, () -> executor_.execute("Hatch Delivery", new HatchDelivery()));
+      operator.whenPressed(3, () -> hatch.toggleClamp());;
       operator.whenPressed(1, () -> hatch.setAngle(180));
     }
     operator.whenPressed(5, () -> cargo.lock());
@@ -150,14 +108,5 @@ public class Robot extends TimedRobot {
     } else {
       cargo.setIntake(.15);
     }
-
-    /*
-    System.out.println("Left Master " + pdp_.getCurrent(0));
-    System.out.println("Right Master " + pdp_.getCurrent(1));
-    System.out.println("Left Slave 1 " + pdp_.getCurrent(15));
-    System.out.println("Left Slave 2 " + pdp_.getCurrent(14));
-    System.out.println("Right Slave 1 " + pdp_.getCurrent(13));
-    System.out.println("Right Slave 2 " + pdp_.getCurrent(12));
-    */
   }
 }

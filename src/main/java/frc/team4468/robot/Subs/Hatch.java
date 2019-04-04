@@ -4,7 +4,6 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
-import edu.wpi.first.wpilibj.AnalogPotentiometer;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
@@ -19,10 +18,7 @@ public class Hatch implements Subsystem {
     private WPI_TalonSRX rotator_ = new WPI_TalonSRX(Constants.Hatch.rotator);
     private DoubleSolenoid clamp_ = new DoubleSolenoid(Constants.Hatch.clamp1, Constants.Hatch.clamp2);
     private DoubleSolenoid popper_ = new DoubleSolenoid(Constants.Hatch.pop1, Constants.Hatch.pop2);
-    private AnalogPotentiometer pot = new AnalogPotentiometer(
-	        Constants.Hatch.potPort, 
-	        1
-	);
+    
     //private DigitalInput zero_ = new DigitalInput(Constants.Hatch.zeroer);
     //private DigitalInput grab_ = new DigitalInput(Constants.Hatch.grab);
     
